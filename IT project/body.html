@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles/admin.css" />
+    <title>Student Portal</title>
+  </head>
+  <body>
+    <main class="portal">
+      <aside class="card2">
+        <div class="profile">
+          <div class="avatar"></div>
+          <div>
+            <h3>Student Name</h3>
+            <p>Computer Science — 200 Level</p>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <a href=""><button class="btn">Profile</button></a>
+          <a href=""><button class="btn ghost">Settings</button></a>
+          <a href=""><button class="btn ghost">Help</button></a>
+        </div>
+
+        <div class="card course-panel">
+          <div class="summary-row">
+            <strong>Courses</strong>
+            <small>Quick Register</small>
+          </div>
+          <div class="course-list">
+            <label class="lab"
+              ><input type="checkbox" value="COS101" /> COS101</label
+            >
+            <label class="lab"
+              ><input type="checkbox" value="COS141" /> COS141</label
+            >
+            <label class="lab"
+              ><input type="checkbox" value="MTH121" /> MTH121</label
+            >
+            <label class="lab"
+              ><input type="checkbox" value="MTH111" /> MTH111</label
+            >
+            <label class="lab"
+              ><input type="checkbox" value="GSP101" /> GSP101</label
+            >
+          </div>
+          <div class="course-actions">
+            <button class="btn" id="addToQueue">Register</button>
+          </div>
+          <ul id="registeredCourses" class="muted small"></ul>
+        </div>
+      </aside>
+
+      <!-- Main Section -->
+      <section>
+        <!-- Welcome -->
+        <div class="card card-row welcome">
+          <div>
+            <h2>Welcome back</h2>
+            <p class="muted">Your dashboard overview</p>
+          </div>
+          <div class="action-row">
+            
+            <button class="btn">New</button>
+          </div>
+        </div>
+
+        <div class="spacer-sm"></div>
+
+        <!-- School Fees -->
+        <div class="card">
+          <div class="card-row">
+            <h3>School Fees</h3>
+            <small class="muted">Payment Summary</small>
+          </div>
+          <div class="fees-info">
+            <p><strong>Total Fees:</strong> ₦150,000</p>
+            <p><strong>Amount Paid:</strong> ₦100,000</p>
+            <p><strong>Balance:</strong> ₦50,000</p>
+            <button class="btn" id="payNowBtn">Pay Now</button>
+          </div>
+        </div>
+
+        <div class="spacer-sm"></div>
+
+        <!-- Course Registration Section -->
+        <div class="card">
+          <div class="card-row">
+            <h3>Course Registration</h3>
+            <small class="muted">Register, Add or Borrow Courses</small>
+          </div>
+
+          <div class="course-registration">
+            <label for="semesterSelect"
+              ><strong>Select Semester:</strong></label
+            >
+            <select id="semesterSelect" class="input">
+              <option value="first">First Semester</option>
+              <option value="second">Second Semester</option>
+            </select>
+
+            <div class="available-courses">
+              <p><strong>Available Courses</strong></p>
+              <label
+                ><input type="checkbox" value="CSC201" /> COS234 - Data
+                Structures</label
+              ><br />
+              <label
+                ><input type="checkbox" value="CSC203" /> COS264
+                 - Computer
+                Architecture</label
+              ><br />
+              <label
+                ><input type="checkbox" value="MTH201" /> MTH216 - Linear
+                Algebra</label
+              ><br />
+              <label
+                ><input type="checkbox" value="GSP201" /> GSP201 - Peace
+                And Conflict</label
+              ><br />
+            </div>
+
+            <hr />
+
+            <div class="add-course">
+              <p><strong>Add or Borrow a Course</strong></p>
+              <input
+                type="text"
+                id="extraCourseCode"
+                placeholder="Enter Course Code (e.g. CSC210)"
+                class="input"
+              />
+              <input
+                type="text"
+                id="extraCourseTitle"
+                placeholder="Enter Course Title"
+                class="input"
+              />
+              <button class="btn" id="addExtraCourse">Add Course</button>
+            </div>
+
+            <hr />
+
+            <div>
+              <button class="btn" id="submitCourses">
+                Submit Registration
+              </button>
+            </div>
+
+            <div class="spacer-xs"></div>
+
+            <h4>Registered Courses:</h4>
+            <ul id="registeredList"></ul>
+
+            <p id="unitCount" class="muted small">Total Units: 0</p>
+          </div>
+        </div>
+
+        <div class="spacer-sm"></div>
+
+        <!-- Results -->
+        <div class="card">
+          <div class="card-row results-header">
+            <h3>Results</h3>
+            <div class="muted">Semester: 1</div>
+          </div>
+          <table class="results">
+            <thead>
+              <tr>
+                <th>Course</th>
+                <th>Score</th>
+                <th>Grade</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>COS101</td>
+                <td>78</td>
+                <td>B+</td>
+              </tr>
+              <tr>
+                <td>COS141</td>
+                <td>65</td>
+                <td>C</td>
+              </tr>
+              <tr>
+                <td>MTH121</td>
+                <td>82</td>
+                <td>A-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="spacer-sm"></div>
+
+        <div class="card">
+          <div class="card-row">
+            <h3>GPA Calculator</h3>
+            <small class="muted">Based on Current Results</small>
+          </div>
+
+          <div class="gpa-section">
+            <button class="btn" id="calcGPA">Calculate GPA</button>
+            <p id="gpaResult" class="muted">Your GPA will appear here.</p>
+          </div>
+        </div>
+
+        <div class="spacer-xs"></div>
+
+        <!-- Timetable -->
+        <div class="card">
+          <h3>Timetable</h3>
+          <table class="timetable">
+            <thead>
+              <tr>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Course</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Mon</td>
+                <td>09:00 - 10:30</td>
+                <td>COS101</td>
+              </tr>
+              <tr>
+                <td>Tue</td>
+                <td>11:00 - 12:30</td>
+                <td>MTH121</td>
+              </tr>
+              <tr>
+                <td>Wed</td>
+                <td>13:00 - 14:30</td>
+                <td>COS141</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="spacer-xs"></div>
+
+        <!-- Messages -->
+        <div class="card">
+          <div class="card-row messages-header">
+            <h3>Messages</h3>
+            <small class="muted">Inbox</small>
+          </div>
+          <ul class="messages">
+            <li><strong>Registrar:</strong> Registration opens next week.</li>
+            <li><strong>Dept:</strong> Seminar on Friday at 2pm.</li>
+          </ul>
+        </div>
+
+        <div class="spacer-xs"></div>
+
+        <!-- Campus Image -->
+        <div class="card">
+          <img
+            src="../gettyimages-1438969575-612x612.jpg"
+            alt="campus"
+            class="img-fluid"
+          />
+        </div>
+
+        <script src="scripts/body.js"></script>
+      </section>
+    </main>
+  </body>
+</html>

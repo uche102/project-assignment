@@ -1,0 +1,239 @@
+/* ===============================
+   GLOBAL
+================================= */
+
+:root {
+  --accent: #3bbf6b;
+  --muted: #64748b;
+  --card: #e6f3e6;
+  --sidebar: #d4e4d4;
+  --radius: 12px;
+  
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(
+    rgba(19, 37, 109, 0.25),
+    rgba(10, 10, 10, 0.25)
+  );
+  line-height: 30px;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  padding: 1rem;
+}
+
+/* ===============================
+   LAYOUT
+================================= */
+
+.portal {
+  margin: 2rem auto;
+  max-width: 1200px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+/* ===============================
+   SIDEBAR
+================================= */
+
+.card2 {
+  background: var(--sidebar);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.profile {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7fe3a0, #3bbf6b);
+}
+
+.profile h3 {
+  font-size: 18px;
+}
+
+.profile p {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.quick-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.btn {
+  background: var(--accent);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn.ghost {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+
+
+.card {
+  background: var(--card);
+  padding: 1rem;
+  border-radius: var(--radius);
+}
+
+.card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.welcome h2 {
+  font-size: 22px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+
+
+.course-panel {
+  margin-top: 1rem;
+}
+
+.course-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  width: 50px;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.course-list label {
+  background: white;
+  width: 90px;
+  display: flex;
+  padding: 10px;
+  gap: 2px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+/* ===============================
+   TABLES
+================================= */
+
+.results,
+.timetable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.results th,
+.results td,
+.timetable th,
+.timetable td {
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
+  text-align: left;
+}
+
+.timetable th {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* ===============================
+   MESSAGES
+================================= */
+
+.messages {
+  list-style: none;
+  margin-top: 12px;
+}
+
+.messages li {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+/* ===============================
+   GPA RESULT
+================================= */
+
+#gpaResult {
+  margin-top: 10px;
+  font-size: 1.1rem;
+  color: var(--muted);
+}
+
+/* ===============================
+   IMAGE
+================================= */
+
+.img-fluid {
+  width: 100%;
+  max-width: 450px;
+  border-radius: var(--radius);
+  margin: auto;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .portal {
+    grid-template-columns: 1fr;
+  }
+
+  .card2 {
+    order: -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .profile {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .avatar {
+    width: 60px;
+    height: 60px;
+  }
+
+  .course-list {
+    grid-template-columns: 1fr;
+  }
+
+  .card-row {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+}
