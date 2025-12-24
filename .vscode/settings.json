@@ -1,3 +1,7 @@
 {
-  "liveServer.settings.port": 5501
+  "mos.port": ""
+}
+
+{
+  "liveServer.settings.port": 4000
 }

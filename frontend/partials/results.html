@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Results</title>
+  </head>
+
+  <body>
+    <div class="partial" data-name="results">
+      <div class="partial-nav">
+        <button data-page="results" class="menu-item dynamic">Results</button>
+      </div>
+
+      <div
+        class="partial-content"
+        data-page="results"
+        data-title="Results"
+        style="display: none"
+      >
+        <section id="results" class="page">
+          <h3>Results</h3>
+          <p class="muted">Semester-by-semester grades (mock):</p>
+
+          <div id="resultsTable" class="panel"></div>
+
+          <div id="documentsPanel" class="panel">
+            <h4>Uploaded Documents</h4>
+            <ul id="documentsList" class="list"></ul>
+          </div>
+        </section>
+      </div>
+    </div>
+    <script src="/frontend/scripts/results-client.js"></script>
+
+  </body>
+</html>

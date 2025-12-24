@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/frontend/styles/styles.css" />
+    <title>Login</title>
+  </head>
+
+  <body>
+    <main>
+      <form id="loginForm" method="post" class="login-card">
+        <h1>Welcome Back</h1>
+        <p class="sub">Login to access your student portal</p>
+
+        <input id="username" type="text" placeholder="Username" required />
+        <input id="password" type="password" placeholder="Password" required />
+        <span id="toggle">Show</span>
+
+        <div
+          id="loginError"
+          role="alert"
+          aria-live="polite"
+          style="color: crimson; margin-top: 0.5rem"
+        ></div>
+
+        <a href="#" class="forgot-link">Forgot password?</a>
+
+        <button id="signInBtn" class="menu-item" type="submit">Sign in</button>
+
+        <p class="small">
+          Dont have an account? <a href="#" class="signup">Sign up</a>
+        </p>
+
+        <button
+          type="button"
+          class="btn admin-btn"
+          onclick="window.location.href='admin.html'"
+        >
+          Login as Admin
+        </button>
+      </form>
+    </main>
+    <script src="/"></script>
+    <script>
+      const password = document.getElementById("password");
+      const toggle = document.getElementById("toggle");
+      toggle.addEventListener("click", () => {
+        if (password.type === "password") {
+          password.type = "text";
+          toggle.textContent = "hide";
+        } else {
+          password.type = "password";
+          toggle.textContent = "show";
+        }
+      });
+    </script>
+  </body>
+</html>

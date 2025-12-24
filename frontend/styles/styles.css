@@ -1,0 +1,134 @@
+/* Background */
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to right, green, white);
+  font-family: Arial, sans-serif;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Main wrapper */
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Login Card */
+.login-card {
+  background: white;
+  position: relative;
+  width: 350px;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  display: flex;
+  margin-top: 10rem;
+  flex-direction: column;
+  text-align: center;
+}
+
+/* Heading */
+.login-card h1 {
+  margin-bottom: 5px;
+  color: rgb(16, 16, 219);
+}
+
+.sub {
+  margin-bottom: 25px;
+  color: #333;
+  font-size: 14px;
+}
+
+/* Inputs */
+.login-card input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-bottom: 2px solid lightgrey;
+  font-size: 16px;
+  outline: none;
+}
+
+.login-card input:focus {
+  border-bottom: 2px solid rgb(16, 16, 219);
+}
+
+/* Forgot password */
+.forgot-link {
+  text-align: right;
+  font-size: 14px;
+  color: #444;
+  text-decoration: none;
+  margin-bottom: 20px;
+}
+#toggle {
+    border: 2px solid rgb(160, 160, 190);
+    border-radius: 3px;
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 14px;
+  color: blue;
+  user-select: none;
+}
+
+.forgot-link:hover {
+  color: blue;
+}
+
+/* Buttons */
+.btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 20px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 8px 0;
+}
+
+/* Main login button */
+.primary-btn {
+  background: rgb(143, 218, 193);
+  color: white;
+}
+
+.primary-btn:hover {
+  background: rgb(10, 10, 150);
+}
+
+/* Admin button */
+.admin-btn {
+  background: #ddd;
+  color: black;
+}
+
+.admin-btn:hover {
+  background: #bbb;
+}
+
+/* Signup text */
+.small {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.small a {
+  color: rgb(156, 214, 161);
+  text-decoration: none;
+}
+
+.small a:hover {
+  text-decoration: underline;
+}
+
+

@@ -1,0 +1,80 @@
+<div class="partial" data-name="dashboard">
+  <div class="partial-nav">
+    <button data-page="dashboard" class="menu-item dynamic active">
+      Dashboard
+    </button>
+  </div>
+
+  <div class="partial-content" data-page="dashboard" data-title="Dashboard">
+    <section id="dashboard" class="page active-page">
+      <div class="cards-row">
+        <div class="card">
+          <div class="card-title">Courses Registered</div>
+          <div id="coursesCount" class="card-value">0 courses</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Results Published</div>
+          <div id="resultsCount" class="card-value">0 results</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Fees Paid</div>
+          <div id="feesPaid" class="card-value">0 NGN</div>
+        </div>
+        <div class="card">
+          <div class="card-title">CGPA</div>
+          <div id="cgpaCard" class="card-value">0.00</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="panel">
+          <h3>Announcements</h3>
+          <div id="announcements" class="announcements"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Upcoming Tasks & Deadlines</h3>
+          <ul id="upcoming" class="task-list"></ul>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>GPA / CGPA Calculator</h3>
+        <div class="gpa-tool">
+          <div class="input-row">
+            <label>Current CGPA:</label>
+            <input
+              id="currentCgpa"
+              type="number"
+              step="0.01"
+              min="0"
+              max="5"
+              value="3.25"
+            />
+            <label>Completed Credits:</label>
+            <input id="completedCredits" type="number" min="0" value="120" />
+            <label>Next Semester Credits:</label>
+            <input id="nextCredits" type="number" min="0" value="24" />
+          </div>
+
+          <div class="input-row">
+            <label>Expected Avg Grade Point (next sem):</label>
+            <select id="expectedGPA">
+              <option value="5">A (5.0)</option>
+              <option value="4">B (4.0)</option>
+              <option value="3">C (3.0)</option>
+              <option value="2">D (2.0)</option>
+              <option value="1">F (1.0)</option>
+            </select>
+            <button id="calcGpaBtn" class="btn primary">Calculate</button>
+          </div>
+
+          <div id="gpaResult" class="gpa-result"></div>
+        
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+

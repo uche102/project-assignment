@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+
+<div class="partial" data-name="documents">
+  <div class="partial-nav">
+    <button data-page="documents" class="menu-item dynamic">Documents</button>
+  </div>
+
+  <div
+    class="partial-content"
+    data-page="documents"
+    data-title="Documents"
+    style="display: none"
+  >
+    <section id="documents" class="page">
+      <h3>Documents</h3>
+      <p class="muted">
+        Download acceptance letter, receipts, or upload documents.
+      </p>
+
+      <div class="panel">
+        <ul class="list">
+          <li>
+            <a href="/mnt/data/Screenshot (40).png" download
+              >Download sample: acceptance_letter.png</a
+            >
+          </li>
+          <li>
+            <a href="#" id="downloadTrans">Request Transcript (mock)</a>
+          </li>
+        </ul>
+        <div class="upload">
+          <label class="btn"
+            >Upload Supporting Document
+            <input id="docUpload" type="file" hidden />
+          </label>
+          <span id="uploadStatus" class="muted"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+</body>
+</html>

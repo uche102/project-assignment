@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin Panel – UNN Portal</title>
+    <link rel="stylesheet" href="/frontend/styles/admin.css" />
+  </head>
+  <body>
+    <header>ADMIN PANEL – UNN PORTAL</header>
+
+    <div class="container">
+      <h2>Upload Student Results (CSV)</h2>
+      <div id="adminLogin" style="margin-bottom: 12px">
+        <label>Admin username <input id="adminUser" value="uche" /></label>
+        <label>Admin password <input id="adminPass" type="password" /></label>
+        <button id="adminLoginBtn">Login</button>
+        <span id="adminLoginStatus" class="muted"></span>
+      </div>
+
+      <input type="file" id="resultFile" accept=".csv" />
+      <button id="uploadResultsBtn">Upload Results</button>
+      <div id="uploadStatus" style="display: none; margin-top: 8px"></div>
+
+      <div id="availablecourse" style="margin-top: 18px">
+        <input
+          type="text"
+          id="courseInput"
+          placeholder="Course code (e.g. CSC101)"
+        />
+        <label for="course">Enter Course Code</label>
+        <button id="fetchStudentsBtn">Fetch Enrolled Students</button>
+      </div>
+    </div>
+    <script src="/frontend/scripts/admin-auth.js"></script>
+    <script src="/frontend/scripts/admin.js></script>
+     <script type="module" src="/frontend/scripts/body.js"></script>
+  </body>
+</html>

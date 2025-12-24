@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Course Registration</title>
+  </head>
+  <body>
+    <div class="partial" data-name="course-registration">
+      <div class="partial-nav">
+        <button data-page="course-registration" class="menu-item dynamic">
+          Course Registration
+        </button>
+        <p>Search and add courses for this semester (mock dataset).</p>
+      </div>
+      <div
+        class="partial-content"
+        data-page="course-registration"
+        data-title="Course Registration"
+      >
+        <section id="course-registration" class="page">
+          <div class="search-row">
+            <input
+              id="courseSearch"
+              placeholder="Search course code or title..."
+            />
+            <select id="filterLevel">
+              <option value="all">All Levels</option>
+              <option value="100">100</option>
+              <option value="200">200</option>
+              <option value="300">300</option>
+              <option value="400">400</option>
+            </select>
+            <button id="searchCoursesBtn" class="btn">Search</button>
+          </div>
+
+          <div class="panel">
+            <h4>Available Courses</h4>
+            <div id="courses-list" class="list"></div>
+          </div>
+
+          <div class="panel">
+            <h4>Registered Courses</h4>
+            <div id="registeredList" class="list"></div>
+            <button id="exportReg" class="btn">
+              Download Registration (CSV)
+            </button>
+          </div>
+        </section>
+      </div>
+    </div>
+    <!-- Scripts at end of body -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        if (typeof window.renderCoursesList === "function")
+          window.renderCoursesList();
+        if (typeof window.renderRegisteredList === "function")
+          window.renderRegisteredList();
+      });
+      document.addEventListener("partials:loaded", function () {
+        // Only render if course-registration page is visible
+        var coursePage = document.querySelector(
+          '.partial-content[data-page="course-registration"]'
+        );
+        if (coursePage && coursePage.style.display !== "none") {
+          if (typeof window.renderCoursesList === "function")
+            window.renderCoursesList();
+          if (typeof window.renderRegisteredList === "function")
+            window.renderRegisteredList();
+        }
+      });
+    </script>
+  </body>
+  <style>
+    #courses-list {
+      margin-top: 20px;
+    }
+    .course-item {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+  </style>
+</html>
