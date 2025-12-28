@@ -69,8 +69,8 @@ main {
   margin-bottom: 20px;
 }
 #toggle {
-    border: 2px solid rgb(160, 160, 190);
-    border-radius: 3px;
+  border: 2px solid rgb(160, 160, 190);
+  border-radius: 3px;
   position: absolute;
   right: 15px;
   top: 50%;
@@ -96,24 +96,38 @@ main {
   margin: 8px 0;
 }
 
+/* Updated Login Button Styling to Match nav.css */
+
 /* Main login button */
 .primary-btn {
-  background: rgb(143, 218, 193);
+  background: rgba(135, 206, 250, 0.8); /* Sky blue background */
   color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
 .primary-btn:hover {
-  background: rgb(10, 10, 150);
+  background: rgba(135, 206, 250, 1); /* Darker sky blue */
 }
 
 /* Admin button */
 .admin-btn {
-  background: #ddd;
-  color: black;
+  background: rgba(70, 130, 180, 1); /* Steel blue */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
 .admin-btn:hover {
-  background: #bbb;
+  background: rgba(70, 130, 180, 0.9);
 }
 
 /* Signup text */
@@ -130,5 +144,3 @@ main {
 .small a:hover {
   text-decoration: underline;
 }
-
-

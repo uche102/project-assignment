@@ -35,15 +35,6 @@
       </div>
     </div>
 
-    <script>
-      document.addEventListener("partials:loaded", function () {
-        var assignmentsPage = document.querySelector(
-          '.partial-content[data-page="assignments"]'
-        );
-        if (assignmentsPage && assignmentsPage.style.display !== "none") {
-          if (typeof window.renderTasks === "function") window.renderTasks();
-        }
-      });
-    </script>
+    <!-- assignments init moved to /scripts/inline-boot.js -->
   </body>
 </html>

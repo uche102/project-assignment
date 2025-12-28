@@ -49,51 +49,39 @@ function parseCsv(text) {
   return out;
 }
 
-uploadBtn.addEventListener("click", () => {
+uploadBtn.addEventListener("click", async () => {
   const file = fileInput?.files?.[0];
   if (!file) return setStatus("No file selected", false);
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    try {
-      const text = e.target.result;
-      const results = parseCsv(text);
-    
 
-      // attempt to POST to server using JWT from localStorage
-      const token = window.localStorage.getItem("token");
-      if (!token) return setStatus("No auth token — please log in", false);
-      const res = await fetch("http://localhost:4000/api/results", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ results }),
-      });
-      // Save document as data URL for results.html
-      const fileReader = new FileReader();
-      fileReader.onload = function (ev) {
-        const docs = JSON.parse(
-          window.localStorage.getItem("studentDocuments") || "[]"
-        );
-        docs.push({ name: file.name, url: ev.target.result });
-        window.localStorage.setItem("studentDocuments", JSON.stringify(docs));
-      };
-      fileReader.readAsDataURL(file);
-      if (res.ok) {
-        setStatus("Results uploaded to server ✓", true);
-      } else {
-        // fallback: save locally
-        const txt = await res.text().catch(() => null);
-        window.localStorage.setItem("studentResults", JSON.stringify(results));
-        setStatus("Server rejected upload — results saved locally", false);
-      }
-    } catch (err) {
-      console.error(err);
-      setStatus("Upload failed", false);
+  const token = window.localStorage.getItem("token");
+  if (!token) return setStatus("No auth token — please log in", false);
+
+  const formData = new FormData();
+  formData.append("result", file); // MUST match multer.single("result")
+
+  // optional metadata
+  formData.append("session", "2024/2025");
+  formData.append("course_code", "CSC101");
+
+  try {
+    const res = await fetch("http://localhost:4000/api/results/upload", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`, // DO NOT set Content-Type
+      },
+      body: formData,
+    });
+
+    if (res.ok) {
+      setStatus("Result file uploaded successfully ✓", true);
+    } else {
+      const err = await res.text();
+      setStatus("Upload failed: " + err, false);
     }
-  };
-  reader.readAsText(file);
+  } catch (err) {
+    console.error(err);
+    setStatus("Upload failed", false);
+  }
 });
 
 // Improve button accessibility and feedback

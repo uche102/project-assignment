@@ -50,26 +50,7 @@
       </div>
     </div>
     <!-- Scripts at end of body -->
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        if (typeof window.renderCoursesList === "function")
-          window.renderCoursesList();
-        if (typeof window.renderRegisteredList === "function")
-          window.renderRegisteredList();
-      });
-      document.addEventListener("partials:loaded", function () {
-        // Only render if course-registration page is visible
-        var coursePage = document.querySelector(
-          '.partial-content[data-page="course-registration"]'
-        );
-        if (coursePage && coursePage.style.display !== "none") {
-          if (typeof window.renderCoursesList === "function")
-            window.renderCoursesList();
-          if (typeof window.renderRegisteredList === "function")
-            window.renderRegisteredList();
-        }
-      });
-    </script>
+    <!-- course-registration init moved to /scripts/inline-boot.js -->
   </body>
   <style>
     #courses-list {

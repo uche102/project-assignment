@@ -1,43 +1,31 @@
-// results-client.js
+// result-client.js
+// Fetch and display results from the backend
 
-// Setup results upload and render table
-(function () {
-  function setupResultsUpload() {
-    const uploadInput = document.getElementById("resultsUpload");
-    if (!uploadInput) return;
+(async function () {
+  // Fetch results for a given student from backend
+  async function fetchStudentResults(studentId) {
+    try {
+      const res = await fetch(`/api/results/${studentId}`);
 
-    uploadInput.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const results = JSON.parse(event.target.result);
-          const existing = JSON.parse(
-            localStorage.getItem("studentResults") || "[]"
-          );
-          localStorage.setItem(
-            "studentResults",
-            JSON.stringify([...existing, ...results])
-          );
-          alert("Results uploaded successfully!");
-          renderUploadedResults();
-        } catch (err) {
-          alert("Error reading results file: " + err.message);
-        }
-      };
-      reader.readAsText(file);
-    });
+      if (!res.ok) throw new Error("Failed to fetch results");
+      const data = await res.json();
+      return data || [];
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
   }
 
-  function renderUploadedResults() {
+  // Render results into the table
+  async function renderResults() {
     const container = document.getElementById("resultsTable");
     if (!container) return;
 
-    const uploaded = JSON.parse(localStorage.getItem("studentResults") || "[]");
-    if (!uploaded.length) {
-      container.innerHTML = "<p>No results uploaded yet.</p>";
+    const studentId = "12345"; // Replace with real student ID from login/session
+    const results = await fetchStudentResults(studentId);
+
+    if (!results.length) {
+      container.innerHTML = "<p>No results available.</p>";
       return;
     }
 
@@ -48,16 +36,20 @@
                       <th>Course</th>
                       <th>Grade</th>
                       <th>Unit</th>
+                      <th>File</th>
                     </tr>
                   </thead>
                   <tbody>`;
 
-    uploaded.forEach((r) => {
+    results.forEach((r) => {
       html += `<tr>
                  <td>${r.student}</td>
-                 <td>${r.courseCode}</td>
+                 <td>${r.course_code}</td>
                  <td>${r.grade}</td>
                  <td>${r.unit || ""}</td>
+          <td>${r.student_id}</td>
+
+
                </tr>`;
     });
 
@@ -65,8 +57,8 @@
     container.innerHTML = html;
   }
 
+  // Initialize on page load
   document.addEventListener("DOMContentLoaded", () => {
-    setupResultsUpload();
-    renderUploadedResults();
+    renderResults();
   });
 })();
