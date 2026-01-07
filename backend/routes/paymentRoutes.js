@@ -1,8 +1,15 @@
-// backend/routes/paymentRoutes.js
 const express = require("express");
 const router = express.Router();
-const paystackController = require("../controllers/paystackController");
 
-router.get("/verify/:reference", paystackController.verifyPayment);
+const {
+  verifyPayment,
+  getMyPayments,
+} = require("../controllers/paystackController");
+
+
+// Verify Paystack payment
+router.get("/verify/:reference", verifyPayment);
+
+
 
 module.exports = router;

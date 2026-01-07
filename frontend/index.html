@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Student Portal — Prototype</title>
 
-    <!-- CSS -->
-    <!-- <link rel="stylesheet" href="./styles/body.css" /> -->
-      <link rel="stylesheet" href="./styles/nav.css" />
-    <!-- <link rel="stylesheet" href="./styles/styles.css" /> -->
+    <link rel="stylesheet" href="styles/body.css" />
+    <link rel="stylesheet" href="styles/nav.css" />
   </head>
   <body>
     <div class="wrapper">
@@ -33,7 +31,7 @@
               <div class="user">
                 <img src="/course.png" alt="avatar" class="avatar" />
                 <div class="user-info">
-                  <div class="name">NWAKOR U.</div>
+                  <div id="topbarUsername">NWAKOR U.</div>
                   <div class="meta">400 Level — Computer Science</div>
                 </div>
               </div>
@@ -68,16 +66,23 @@
         </main>
       </div>
     </div>
+    
+
 
     <!-- Paystack library -->
     <script src="https://js.paystack.co/v1/inline.js"></script>
 
     <!-- JS Scripts -->
-    <script src="./scripts/nav-loader.js" defer></script>
-    <script src="./scripts/body.js" defer></script>
-    <script src="./scripts/results-client.js" defer></script>
-    <script src="./scripts/paystack.js" defer></script>
-    <script src="./scripts/inline-boot.js" defer></script>
-    <!-- inline behavior consolidated in /scripts/inline-boot.js -->
+   <body>
+  ...
+  <script src="/scripts/nav-loader.js"></script>
+  <script src="/scripts/paystack.js"></script>
+  
+  <script src="/scripts/results-client.js"></script>
+  <script src="/scripts/course-reg-client.js"></script>
+  <script src="/scripts/dashboard-client.js"></script>
+  <script src="/scripts/borrow-client.js"></script>
+</body>
+    <!-- inline behavior moved to body.js -->
   </body>
 </html>

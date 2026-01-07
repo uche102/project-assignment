@@ -17,12 +17,15 @@
     const password = passEl.value;
     if (!username || !password) return setStatus("provide credentials", true);
     setStatus("logging in...");
+    // ... inside the event listener ...
     try {
-      const res = await fetch("http://localhost:4000/api/auth/login", {
+      // CHANGE THIS LINE: Use "user-login" instead of "login"
+      const res = await fetch("http://localhost:4000/api/auth/user-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
+      // ... rest of code matches ...
       if (!res.ok) {
         const j = await res.json().catch(() => ({ error: "login failed" }));
         return setStatus(j.error || "login failed", true);

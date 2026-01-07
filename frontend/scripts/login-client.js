@@ -4,118 +4,162 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!form) return;
 
-  // Handle login submission
-  form.addEventListener("submit", async (ev) => {
-    ev.preventDefault();
-    errEl.textContent = "";
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value;
+  // ============================
+  // Config
+  // ============================
+  const API_BASE = "http://localhost:4000"; // change in production
+
+  // ============================
+  // Helpers
+  // ============================
+  function decodeToken(token) {
     try {
-      let res = await fetch("http://localhost:4000/api/auth/user-login", {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload;
+    } catch {
+      return null;
+    }
+  }
+
+  function restoreUser(token) {
+    const payload = decodeToken(token);
+    if (!payload) return;
+
+    window.state = window.state || {};
+    window.state.user = {
+      id: payload.id,
+      username: payload.username,
+    };
+  }
+
+  // Restore user on refresh
+  const savedToken = localStorage.getItem("token");
+  if (savedToken) restoreUser(savedToken);
+
+  // ============================
+  // Login submit
+  // ============================
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errEl.textContent = "";
+
+    const username = document.getElementById("username")?.value.trim();
+    const password = document.getElementById("password")?.value;
+
+    if (!username || !password) {
+      errEl.textContent = "Username and password are required";
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/user-login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
-      if (res.status === 401) {
-        const body = await res.json().catch(() => ({}));
-        errEl.textContent =
-          body && body.error ? body.error : "invalid username or password";
-        return;
-      }
+
+      const data = await res.json();
+
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        errEl.textContent = body && body.error ? body.error : "Login failed";
+        errEl.textContent = data?.error || "Invalid login credentials";
         return;
       }
-      // success: server returned a token (JWT). Store and redirect.
-      const body = await res.json().catch(() => ({}));
-      if (body && body.token) {
-        window.localStorage.setItem("token", body.token);
+
+      if (!data.token) {
+        errEl.textContent = "Login failed: no token returned";
+        return;
       }
-      window.location.href = "body.html";
+
+      // Save token
+      localStorage.setItem("token", data.token);
+      restoreUser(data.token);
+
+      // Redirect after successful login
+      localStorage.setItem("landingPage", "dashboard");
+      
+      window.location.href = "../index.html";
     } catch (err) {
-      console.error("login error", err);
-      errEl.textContent = "Network error";
+      console.error("Login error:", err);
+      errEl.textContent = "Unable to connect to server";
     }
   });
 
-  // Signup flow: show a small inline signup form when user clicks the signup link
+  // ============================
+  // Password toggle
+  // ============================
+  const passwordInput = document.getElementById("password");
+  const toggle = document.getElementById("toggle");
+
+  if (passwordInput && toggle) {
+    toggle.addEventListener("click", () => {
+      const isHidden = passwordInput.type === "password";
+      passwordInput.type = isHidden ? "text" : "password";
+      toggle.textContent = isHidden ? "hide" : "show";
+    });
+  }
+
+  // ============================
+  // Signup
+  // ============================
   const signupLink = document.querySelector(".signup");
-  let signupEl = null;
+  let signupEl;
+
   if (signupLink) {
     signupLink.addEventListener("click", (e) => {
       e.preventDefault();
-      if (signupEl) return; // already shown
+      if (signupEl) return;
+
       signupEl = document.createElement("div");
-      signupEl.style.marginTop = "12px";
       signupEl.innerHTML = `
-        <input id="signupUsername" type="text" placeholder="Choose a username" required style="display:block;margin:.25rem 0;" />
-        <input id="signupPassword" type="password" placeholder="Choose a password" required style="display:block;margin:.25rem 0;" />
-        <button id="createAccountBtn" type="button" class="menu-item">Create account</button>
-        <div id="signupStatus" role="status" style="margin-top:.5rem"></div>
+        <input id="signupUsername" placeholder="Choose username" />
+        <input id="signupPassword" type="password" placeholder="Choose password" />
+        <button id="createAccountBtn" type="button">Create account</button>
+        <div id="signupStatus"></div>
       `;
       form.appendChild(signupEl);
 
-      const createBtn = document.getElementById("createAccountBtn");
-      const sUser = document.getElementById("signupUsername");
-      const sPass = document.getElementById("signupPassword");
-      const sStatus = document.getElementById("signupStatus");
+      const status = signupEl.querySelector("#signupStatus");
 
-      createBtn.addEventListener("click", async () => {
-        sStatus.textContent = "";
-        const u = sUser.value && sUser.value.trim();
-        const p = sPass.value;
-        if (!u || !p)
-          return (sStatus.textContent = "username and password required");
-        // save signup details locally first so they're not lost on network failure
-        const pending = { username: u, password: p, createdAt: Date.now() };
-        try {
-          window.localStorage.setItem("pendingSignup", JSON.stringify(pending));
+      signupEl
+        .querySelector("#createAccountBtn")
+        .addEventListener("click", async () => {
+          const u = signupEl.querySelector("#signupUsername").value.trim();
+          const p = signupEl.querySelector("#signupPassword").value;
 
-          const res = await fetch(
-            "http://localhost:4000/api/auth/public-register",
-            {
+          if (!u || !p) {
+            status.textContent = "All fields are required";
+            return;
+          }
+
+          try {
+            const res = await fetch(`${API_BASE}/api/auth/public-register`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ username: u, password: p }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+              status.textContent = data?.error || "Registration failed";
+              return;
             }
-          );
-          if (res.status === 403) {
-            const body = await res.json().catch(() => ({}));
-            sStatus.textContent = body.error || "registration disabled";
-            return;
+
+            status.style.color = "green";
+            status.textContent = "Account created — please login";
+
+            document.getElementById("username").value = u;
+            document.getElementById("password").value = p;
+
+            setTimeout(() => {
+              signupEl.remove();
+              signupEl = null;
+            }, 1500);
+          } catch (err) {
+            console.error("Signup error:", err);
+            status.textContent = "Network error";
           }
-          if (!res.ok) {
-            const body = await res.json().catch(() => ({}));
-            sStatus.textContent = body.error || "registration failed";
-            return;
-          }
-          // success: remove pending copy and notify user
-          window.localStorage.removeItem("pendingSignup");
-          sStatus.style.color = "green";
-          sStatus.textContent = "Account created — please sign in";
-          // auto-fill login fields
-          document.getElementById("username").value = u;
-          document.getElementById("password").value = p;
-          // remove signup form after a short delay
-          setTimeout(() => {
-            if (signupEl) signupEl.remove();
-            signupEl = null;
-            sStatus.textContent = "";
-          }, 1500);
-        } catch (err) {
-          console.error("signup error", err);
-          // keep pending signup in localStorage and notify user
-          try {
-            window.localStorage.setItem(
-              "pendingSignup",
-              JSON.stringify(pending)
-            );
-          } catch (e) {}
-          sStatus.textContent =
-            "Network error — signup saved locally, will retry when online";
-        }
-      });
+        });
     });
   }
 });

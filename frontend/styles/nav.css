@@ -1,82 +1,84 @@
-/* Sliding sidebar animation and menu styles */
+/* === SIDEBAR CONTAINER === */
 .sidebar {
-  transition: transform 320ms cubic-bezier(0.2, 0.9, 0.2, 1), opacity 220ms ease;
-
-  /* make sure layer is isolated for smoother transforms */
-  transform-origin: left;
-}
-
-/* When collapsed, move sidebar completely off-screen to the left */
-.sidebar.collapsed {
-  transform: translateX(-80px);
-  opacity: 0;
-}
-
-/* Ensure the visible state is reset */
-.sidebar.expanded {
+  width: var(--sidebar-width);
+  background: var(--bg-sidebar);
+  height: calc(100vh - var(--header-height));
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+  overflow-y: auto;
+  z-index: 25;
+  
+  /* Animation Config */
+  transition: transform 0.3s ease, width 0.3s ease;
   transform: translateX(0);
-  opacity: 1;
 }
 
-/* Menu placeholder styling */
-#menu {
+/* === COLLAPSED STATE (Triggered by JS) === */
+.sidebar.collapsed {
+  transform: translateX(-100%); /* Slide completely off screen */
+}
+
+/* === MENU ITEMS === */
+.menu {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.5rem 0.25rem;
+  gap: 5px;
 }
 
-.menu-item.dynamic {
+/* "MODULES" Label */
+.menu::before {
+  content: "MODULES";
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 700;
+  padding: 10px 24px;
+  letter-spacing: 0.5px;
+}
+
+.menu-item {
   background: transparent;
   border: none;
   text-align: left;
-  padding: 0.6rem 0.75rem;
-  width: 100%;
+  padding: 12px 24px;
+  font-size: 0.95rem;
+  color: #4b5563; /* Grey text */
   cursor: pointer;
-  border-radius: 8px;
-  transition: transform 180ms cubic-bezier(0.2, 0.9, 0.3, 1),
-    background 160ms ease, color 160ms ease, opacity 160ms ease;
-  will-change: transform, opacity;
-  transform: translateX(0);
-  opacity: 1;
+  transition: all 0.2s;
+  width: 100%;
+  border-left: 3px solid transparent;
+  font-weight: 500;
 }
 
+/* Hover */
 .menu-item:hover {
-  background: rgba(0, 0, 0, 0.04);
-  color: rgb(0, 0, 7);
-  /* transform: translateX(6px); */
-}
-.menu-item.dynamic.active {
-  background: rgba(0, 0, 0, 0.06);
-  font-weight: 700;
-  color: inherit;
-  transform: translateX(4px);
+  background: #f9fafb;
+  color: var(--primary);
 }
 
-/* Focus visibility for keyboard users */
-.menu-item.dynamic:focus {
-  outline: 3px solid rgba(21, 156, 228, 0.25);
-  outline-offset: 2px;
+/* Active State (Green highlight like screenshot) */
+.menu-item.active {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-left-color: var(--primary);
+  font-weight: 600;
 }
 
-.menu-item.dynamic:focus:not(:focus-visible) {
-  outline: none;
-}
-
-/* Small-screen adjustments: show overlay when open */
-@media (max-width: 900px) {
+/* === MOBILE BEHAVIOR === */
+@media (max-width: 768px) {
+  /* On mobile, sidebar is hidden by default (-100%) */
   .sidebar {
-    position: fixed;
-    left: 0;
+    height: 100vh;
     top: 0;
-    bottom: 0;
-    z-index: 120;
-    width: 280px;
-    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15);
-    background: var(--bg, #fff);
+    transform: translateX(-100%);
+    box-shadow: none;
   }
-
-  .main {
-    margin-left: 0;
+  
+  /* On mobile, "expanded" class slides it IN */
+  .sidebar.expanded {
+    transform: translateX(0);
+    box-shadow: 10px 0 20px rgba(0,0,0,0.1);
   }
 }

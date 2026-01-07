@@ -1,105 +1,182 @@
-/* Cleaned and Refined Styles */
+/* === VARIABLES & THEME === */
 :root {
-  --bg: #f2f9f4; /* Light green background */
-  --card: #ffffff;
-  --muted: #030303; /* Soft dark green/grey */
-  --accent: #12c456; /* UNN green */
-  --accent-light: #d9f5e4; /* Very light mint green */
-  --accent-2: #138b50;
-  --shadow: 0 8px 20px rgba(0, 80, 20, 0.08);
-  --radius: 12px;
-  --text: #33b95d; /* Dark forest green */
+  /* Brand Colors */
+  --primary: #2d7a46;       /* UNN Green */
+  --primary-light: #e8f5e9; 
+  --bg-body: #f3f3f7;       /* Light Purple/Grey background */
+  --bg-sidebar: #ffffff;
+  --text-main: #333333;     
+  --text-muted: #777777;
+  --border: #eaeaea;
+  
+  /* Dashboard Cards (Screenshot Colors) */
+  --card-purple: #7e7db0;
+  --card-blue: #709fdc;
+  --card-teal: #57c1a6;
+  
+  /* Dimensions */
+  --sidebar-width: 260px;
+  --header-height: 70px;
+  --radius: 10px;
 }
 
-/* Main page wrapper */
-.wrapper {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
+/* === RESET === */
+* { box-sizing: border-box; }
 body {
   margin: 0;
-  padding: 0;
-  font-family: "Segoe UI", Arial, Helvetica, sans-serif;
-  background: #f4f6fb;
-  color: #222;
+  font-family: "Segoe UI", "Roboto", Helvetica, Arial, sans-serif;
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  overflow-x: hidden;
 }
 
-/* === Buttons === */
-.btn {
-  background: #14cc64;
-  border: 0;
-  padding: 10px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  color: var(--text);
-  transition: opacity 0.3s ease;
-}
-.btn.primary {
-  background: green;
-  color: #25ca20;
-}
-.btn:hover {
-  opacity: 0.95;
-}
-
-/* === Sidebar NOTE === */
-/* Sidebar positioning and animation moved to `nav.css`. */
-
-/* === Menu Items === */
-.menu-item {
-  background: rgb(227, 225, 225);
-  text-align: left;
-  padding: 10px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  color: rgb(35, 128, 66);
-  transition: background 0.3s ease, color 0.3s ease;
-}
-.menu-item.active,
-.menu-item:hover {
-  background: var(--accent-light);
-  color: var(--accent);
-}
-
-/* === Dark Mode Adjustments === */
-[data-theme="dark"] {
-  --bg: #e5eee8; /* Soft very-light green-grey */
-  --card: #f7fcf9; /* Light mint white */
-  --muted: #3d5246; /* Soft green-grey text */
-  --accent: #0a8a3a; /* Normal UNN green stays the same */
-  --accent-light: #ccebd8; /* Lighter mint */
-  --text: #14291e; /* Dark green text */
-}
-[data-theme="dark"] .menu-item.active,
-[data-theme="dark"] .menu-item:hover {
-  background: var(--accent-light);
-  color: var(--accent);
-}
-
-/* === Brand Logo === */
-.brand-logo {
-  width: 46px;
-  height: 46px;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-/* === General Cleanup === */
-.menu {
+/* === LAYOUT STRUCTURE === */
+.app {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 0;
-  margin: 0;
+  min-height: 100vh;
 }
 
-.menu img {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
+/* === TOPBAR === */
+.topbar {
+  height: var(--header-height);
+  background: var(--bg-body);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  
+  /* Fixed Positioning relative to Sidebar */
+  position: fixed;
+  top: 0;
+  right: 0;
+  /* Width is 100% minus sidebar */
+  width: calc(100% - var(--sidebar-width)); 
+  z-index: 20;
+  transition: width 0.3s ease;
 }
 
-/* Removed redundant and conflicting styles. */
+/* === TOGGLE LOGIC: TOPBAR === */
+/* When sidebar is collapsed, topbar becomes full width */
+body:has(.sidebar.collapsed) .topbar {
+  width: 100%;
+}
+
+.top-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  color: #555;
+}
+.icon-btn:hover { background: rgba(0,0,0,0.05); }
+
+/* User Profile */
+.user { display: flex; align-items: center; gap: 10px; }
+.avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; }
+.user-info .name { font-weight: 700; font-size: 0.9rem; color: #333; }
+.user-info .meta { font-size: 0.75rem; color: #666; }
+
+/* === MAIN CONTENT === */
+.content {
+  margin-top: var(--header-height);
+  /* Push content to the right by default */
+  margin-left: var(--sidebar-width);
+  padding: 30px;
+  min-height: calc(100vh - var(--header-height));
+  transition: margin-left 0.3s ease;
+}
+
+/* === TOGGLE LOGIC: CONTENT === */
+/* When sidebar is collapsed, content margin becomes 0 */
+body:has(.sidebar.collapsed) .content {
+  margin-left: 0;
+}
+
+/* === DASHBOARD CARDS (From Screenshot) === */
+.cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.card {
+  padding: 24px;
+  border-radius: var(--radius);
+  color: white;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 140px;
+}
+
+/* Card Specific Colors */
+.card:nth-child(1) { background-color: var(--card-purple); }
+.card:nth-child(2) { background-color: var(--card-blue); }
+.card:nth-child(3) { background-color: var(--card-teal); }
+.card:nth-child(n+4) { background-color: #fff; color: #333; }
+
+.card-title { font-size: 0.9rem; opacity: 0.9; margin-bottom: 8px; }
+.card-value { font-size: 1.5rem; font-weight: 700; }
+
+/* === BRAND HEADER (Fixed Top Left) === */
+.brand {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: var(--header-height);
+  background: var(--bg-sidebar);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 12px;
+  border-right: 1px solid var(--border);
+  z-index: 30;
+  transition: transform 0.3s ease;
+}
+
+/* === TOGGLE LOGIC: BRAND === */
+/* Hide Brand when sidebar collapses */
+body:has(.sidebar.collapsed) .brand {
+  transform: translateX(-100%);
+}
+
+.brand-logo { width: 30px; height: 30px; }
+.brand-text strong { color: var(--primary); display: block; font-size: 0.9rem; }
+.brand-text small { color: #888; font-size: 0.75rem; }
+
+/* === UTILS === */
+.panel {
+  background: white;
+  padding: 20px;
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  background: var(--primary);
+  color: white;
+}
+
+/* === MOBILE === */
+@media (max-width: 768px) {
+  .topbar { width: 100%; }
+  .content { margin-left: 0; }
+  .brand { display: none; } /* Hide brand on mobile, sidebar covers it */
+}

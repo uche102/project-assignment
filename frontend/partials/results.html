@@ -12,25 +12,54 @@
         <button data-page="results" class="menu-item dynamic">Results</button>
       </div>
 
-      <div
-        class="partial-content"
-        data-page="results"
-        data-title="Results"
-        style="display: none"
-      >
+      <div class="partial-content" data-page="results">
         <section id="results" class="page">
-          <h3>Results</h3>
-          <p class="muted">Semester-by-semester grades (mock):</p>
+          <h3>My Semester Results</h3>
 
-          <div id="resultsTable" class="panel"></div>
+          <div id="resultsStatus" style="color: red; margin-bottom: 10px"></div>
 
-          <div id="documentsPanel" class="panel">
+          <div class="table-wrapper">
+            <table
+              class="styled-table"
+              style="width: 100%; border-collapse: collapse; margin-top: 1rem"
+            >
+              <thead>
+                <tr style="background: #eee; text-align: left">
+                  <th style="padding: 10px">Course Code</th>
+                  <th style="padding: 10px">Unit</th>
+                  <th style="padding: 10px">Grade</th>
+                  <th style="padding: 10px">Status</th>
+                </tr>
+              </thead>
+
+              <tbody id="resultsTableBody">
+                <tr>
+                  <td colspan="4" style="padding: 20px; text-align: center">
+                    Loading results...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div
+            id="documentsPanel"
+            class="panel"
+            style="
+              margin-top: 2rem;
+              border-top: 1px solid #ccc;
+              padding-top: 1rem;
+            "
+          >
             <h4>Uploaded Documents</h4>
-            <ul id="documentsList" class="list"></ul>
+            <ul id="documentsList" class="list">
+              <li>No documents found.</li>
+            </ul>
           </div>
         </section>
       </div>
     </div>
+
     <script src="/scripts/results-client.js"></script>
   </body>
 </html>

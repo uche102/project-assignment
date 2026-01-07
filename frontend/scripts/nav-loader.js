@@ -1,14 +1,45 @@
 // nav-loader.js — dynamically load nav button partials and page partials
 (function () {
+  // =======================================
+  // 1. SESSION / AUTH CHECK
+  // =======================================
+  const token = localStorage.getItem("token");
+  const path = window.location.pathname;
+
+  // SAFETY CHECK: If already on a public page, do nothing.
+  // We check for "login.html" which matches "/partials/login.html" too.
+  if (
+    path.includes("login.html") ||
+    path.includes("register.html") ||
+    path.includes("admin.html")
+  ) {
+    // We are on the login page. Stop here.
+    // Do NOT return here if you want the init() function below to run (e.g. if login page needs partials)
+
+    return;
+  }
+
+  // IF NO TOKEN -> REDIRECT TO LOGIN (Inside Partials)
+  if (!token) {
+    console.warn("No token found. Redirecting to login...");
+    // FIX: Point to the file inside the partials folder
+    window.location.replace("/partials/login.html");
+    return; // Stop execution
+  }
+
+  // =======================================
+  // 2. NAV & PARTIAL LOADER
+  // =======================================
   const partials = [
     "dashboard",
     "course-registration",
     "borrow-courses",
     "results",
-    "assignments",
+    "calendar",
     "academic-fees",
     "documents",
     "lecturers",
+
     "profile",
     "signout",
   ];
@@ -22,8 +53,7 @@
   if (!menuEl || !pagesContainer) return;
 
   async function loadPartial(name) {
-    // use absolute path from Express static route
-    const url = `/frontend/partials/${name}.html`;
+    const url = `partials/${name}.html`;
     try {
       const res = await fetch(url);
       if (!res.ok) throw new Error("Fetch failed: " + res.status);
@@ -44,7 +74,6 @@
       const p = await loadPartial(name);
       if (!p) continue;
 
-      // append nav buttons
       if (p.navNode) {
         const btn =
           p.navNode.querySelector("[data-page]") || p.navNode.firstElementChild;
@@ -57,23 +86,60 @@
         }
       }
 
-      // append page content
       if (p.contentNode) {
         p.contentNode.style.display = "none";
         pagesContainer.appendChild(p.contentNode);
       }
     }
 
+    // ... inside init() function ...
+
     // menu click handler
     menuEl.addEventListener("click", (ev) => {
       const b = ev.target.closest("[data-page]");
       if (!b) return;
-      showPage(b.getAttribute("data-page"));
+
+      const pageName = b.getAttribute("data-page");
+
+      // === NEW: HANDLE SIGN OUT ===
+      if (pageName === "signout") {
+        // 1. Clear credentials
+        localStorage.removeItem("token");
+        localStorage.removeItem("landingPage");
+
+        // 2. Redirect to Login
+        // USE THIS if your login is inside partials:
+        window.location.href = "/partials/login.html";
+
+        // OR USE THIS if your login is in the root folder:
+        // window.location.href = "/login.html";
+        return;
+      }
+      // ============================
+
+      showPage(pageName);
       if (sidebar && window.innerWidth <= 900)
         sidebar.classList.add("collapsed");
     });
+    // EXISTING: Sidebar click handler
+    menuEl.addEventListener("click", (ev) => {
+      const b = ev.target.closest("[data-page]");
+      if (!b) return;
+      showPage(b.getAttribute("data-page"));
+      // ... existing code ...
+    });
 
-    // hamburger toggle
+    // === NEW: Content click handler (For links inside pages) ===
+    document.body.addEventListener("click", (ev) => {
+      // Check if the clicked element has 'data-go-to' attribute
+      const link = ev.target.closest("[data-go-to]");
+      if (link) {
+        ev.preventDefault(); // Stop normal link behavior
+        const targetPage = link.getAttribute("data-go-to");
+        showPage(targetPage); // Switch the view!
+      }
+    });
+
     if (hamburger && sidebar) {
       hamburger.setAttribute(
         "aria-expanded",
@@ -92,11 +158,15 @@
       });
     }
 
-    // show first page by default
-    const first = menuEl.querySelector("[data-page]");
+    const landing = localStorage.getItem("landingPage") || null;
+    const first = landing
+      ? menuEl.querySelector(`[data-page="${landing}"]`)
+      : menuEl.querySelector("[data-page]");
+
     if (first) showPage(first.getAttribute("data-page"));
 
-    // dispatch loaded event
+    localStorage.removeItem("landingPage");
+
     if (!window.__PARTIALS_LOADED__) {
       window.__PARTIALS_LOADED__ = true;
       document.dispatchEvent(new CustomEvent("partials:loaded"));

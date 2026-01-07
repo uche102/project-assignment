@@ -1,14 +1,29 @@
-/* Background */
-body {
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(to right, green, white);
-  font-family: Arial, sans-serif;
+:root {
+  --login-bg: linear-gradient(135deg, #f7fbf7 0%, #ffffff 100%);
+  --login-accent: #0a8a3a;
+  --login-soft: #e9f6ec;
 }
+
+/* Base reset for this sheet */
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
+  background: radial-gradient(
+      circle at 10% 10%,
+      rgba(10, 138, 58, 0.04),
+      transparent 20%
+    ),
+    #f6faf6;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Main wrapper */
@@ -16,48 +31,53 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
+  padding: 24px;
 }
 
 /* Login Card */
 .login-card {
-  background: white;
+  background: var(--bg-card, white);
   position: relative;
-  width: 350px;
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  width: 360px;
+  max-width: 96vw;
+  padding: 28px;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(10, 20, 30, 0.06);
   display: flex;
-  margin-top: 10rem;
+  margin-top: 0;
   flex-direction: column;
-  text-align: center;
+  text-align: left;
+  border: 1px solid rgba(10, 20, 30, 0.03);
 }
 
 /* Heading */
 .login-card h1 {
-  margin-bottom: 5px;
-  color: rgb(16, 16, 219);
+  margin-bottom: 6px;
+  color: var(--login-accent);
+  font-size: 1.5rem;
 }
 
 .sub {
-  margin-bottom: 25px;
-  color: #333;
-  font-size: 14px;
+  margin-bottom: 18px;
+  color: var(--text-muted, #666);
+  font-size: 0.95rem;
 }
 
 /* Inputs */
 .login-card input {
   width: 100%;
-  padding: 12px;
+  padding: 12px 14px;
   margin: 10px 0;
-  border: none;
-  border-bottom: 2px solid lightgrey;
-  font-size: 16px;
+  border: 1px solid var(--border, #e6e9ec);
+  border-radius: 8px;
+  font-size: 0.97rem;
   outline: none;
+  background: var(--bg-card);
 }
-
 .login-card input:focus {
-  border-bottom: 2px solid rgb(16, 16, 219);
+  border-color: var(--login-accent);
+  box-shadow: 0 6px 18px rgba(10, 138, 58, 0.06);
 }
 
 /* Forgot password */
@@ -69,16 +89,17 @@ main {
   margin-bottom: 20px;
 }
 #toggle {
-  border: 2px solid rgb(160, 160, 190);
-  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 6px;
+  padding: 4px 8px;
   position: absolute;
-  right: 15px;
+  right: 18px;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
-  font-size: 14px;
-  color: blue;
-  user-select: none;
+  font-size: 13px;
+  color: var(--login-accent);
+  background: var(--login-soft);
 }
 
 .forgot-link:hover {
@@ -89,7 +110,7 @@ main {
 .btn {
   width: 100%;
   padding: 12px;
-  border-radius: 20px;
+  border-radius: 10px;
   border: none;
   font-size: 16px;
   cursor: pointer;
@@ -100,47 +121,35 @@ main {
 
 /* Main login button */
 .primary-btn {
-  background: rgba(135, 206, 250, 0.8); /* Sky blue background */
-  color: white;
-  border: none;
+  background: var(--login-accent);
+  color: #fff;
   border-radius: 8px;
   padding: 0.75rem 1rem;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s ease;
+  transition: transform 150ms ease, box-shadow 150ms;
 }
-
 .primary-btn:hover {
-  background: rgba(135, 206, 250, 1); /* Darker sky blue */
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(10, 138, 58, 0.12);
 }
 
 /* Admin button */
 .admin-btn {
-  background: rgba(70, 130, 180, 1); /* Steel blue */
-  color: white;
-  border: none;
+  background: #2b7ab8;
+  color: #fff;
   border-radius: 8px;
   padding: 0.75rem 1rem;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.admin-btn:hover {
-  background: rgba(70, 130, 180, 0.9);
 }
 
 /* Signup text */
 .small {
-  margin-top: 15px;
-  font-size: 14px;
+  margin-top: 14px;
+  font-size: 13px;
+  text-align: center;
 }
-
 .small a {
-  color: rgb(156, 214, 161);
+  color: var(--login-accent);
   text-decoration: none;
 }
-
 .small a:hover {
   text-decoration: underline;
 }

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/frontend/styles/styles.css" />
+    <link rel="stylesheet" href="../styles/styles.css" />
     <title>Login</title>
   </head>
 
@@ -41,19 +41,6 @@
         </button>
       </form>
     </main>
-    <script src="/frontend/scripts/login-client.js"></script>
-    <script>
-      const password = document.getElementById("password");
-      const toggle = document.getElementById("toggle");
-      toggle.addEventListener("click", () => {
-        if (password.type === "password") {
-          password.type = "text";
-          toggle.textContent = "hide";
-        } else {
-          password.type = "password";
-          toggle.textContent = "show";
-        }
-      });
-    </script>
+    <script src="../scripts/login-client.js"></script>
   </body>
 </html>

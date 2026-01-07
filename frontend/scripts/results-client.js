@@ -1,64 +1,71 @@
-// result-client.js
-// Fetch and display results from the backend
+document.addEventListener("DOMContentLoaded", () => {
+  const API_BASE = "http://localhost:4000";
 
-(async function () {
-  // Fetch results for a given student from backend
-  async function fetchStudentResults(studentId) {
-    try {
-      const res = await fetch(`/api/results/${studentId}`);
-
-      if (!res.ok) throw new Error("Failed to fetch results");
-      const data = await res.json();
-      return data || [];
-    } catch (err) {
-      console.error(err);
-      return [];
-    }
-  }
-
-  // Render results into the table
   async function renderResults() {
-    const container = document.getElementById("resultsTable");
-    if (!container) return;
+    const tableBody = document.getElementById("resultsTableBody");
+    if (!tableBody || tableBody.dataset.loaded === "true") return;
 
-    const studentId = "12345"; // Replace with real student ID from login/session
-    const results = await fetchStudentResults(studentId);
+    // 1. Get Token
+    let token = localStorage.getItem("token");
+    if (!token) {
+      tableBody.innerHTML = '<tr><td colspan="4">Please log in.</td></tr>';
+      return;
+    }
+    token = token.replace(/['"]+/g, "").trim();
 
-    if (!results.length) {
-      container.innerHTML = "<p>No results available.</p>";
+    // 2. Decode User to get username
+    let user = {};
+    try {
+      user = JSON.parse(atob(token.split(".")[1]));
+    } catch (e) {
       return;
     }
 
-    let html = `<table style="width:100%;border-collapse:collapse">
-                  <thead>
-                    <tr>
-                      <th>Student</th>
-                      <th>Course</th>
-                      <th>Grade</th>
-                      <th>Unit</th>
-                      <th>File</th>
-                    </tr>
-                  </thead>
-                  <tbody>`;
+    try {
+      // 3. FETCH FROM DATABASE (The Official Source)
+      const res = await fetch(`${API_BASE}/api/results/${user.username}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    results.forEach((r) => {
-      html += `<tr>
-                 <td>${r.student}</td>
-                 <td>${r.course_code}</td>
-                 <td>${r.grade}</td>
-                 <td>${r.unit || ""}</td>
-          <td>${r.student_id}</td>
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      const myResults = data.results || [];
 
+      if (myResults.length === 0) {
+        tableBody.innerHTML =
+          '<tr><td colspan="4" style="text-align:center;">No results found in Database.</td></tr>';
+      } else {
+        tableBody.innerHTML = myResults
+          .map(
+            (r) => `
+          <tr style="border-bottom: 1px solid #eee;">
+            <td style="padding: 10px;">${r.course_code}</td>
+            <td style="padding: 10px;">${r.unit || "-"}</td>
+            <td style="padding: 10px; font-weight: bold;">${r.grade}</td>
+            <td style="padding: 10px; color: ${
+              r.grade === "F" ? "red" : "green"
+            }; font-weight:bold;">
+              ${r.grade === "F" ? "Fail" : "Pass"}
+            </td>
+          </tr>
+        `
+          )
+          .join("");
+      }
+    } catch (err) {
+      console.error("Result Fetch Error:", err);
+      tableBody.innerHTML =
+        '<tr><td colspan="4">Error loading results from server.</td></tr>';
+    }
 
-               </tr>`;
-    });
-
-    html += "</tbody></table>";
-    container.innerHTML = html;
+    tableBody.dataset.loaded = "true";
   }
 
-  // Initialize on page load
-  document.addEventListener("DOMContentLoaded", () => {
-    renderResults();
+  renderResults();
+
+  // Watch for page navigation
+  const observer = new MutationObserver(() => {
+    if (document.getElementById("resultsTableBody")) renderResults();
   });
-})();
+  observer.observe(document.body, { childList: true, subtree: true });
+});

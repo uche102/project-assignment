@@ -2,30 +2,30 @@ require("dotenv").config();
 const express = require("express");
 const { Client } = require("pg");
 const path = require("path");
-
-const helmet = require("helmet");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const rateLimit = require("express-rate-limit");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const fs = require("fs");
 
 const app = express();
 
 /* =======================
    CONFIG
 ======================= */
-
 const PORT = Number(process.env.PORT) || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-key";
-const ADMIN_USER = process.env.ADMIN_USER || "uche";
-const ADMIN_PASS = process.env.ADMIN_PASS || "unn123";
 const BCRYPT_ROUNDS = Number(process.env.BCRYPT_ROUNDS) || 12;
+
+/* =======================
+   STATIC FILES SETUP
+======================= */
+const frontendStaticDir = path.join(__dirname, "../frontend");
+app.use(express.static(frontendStaticDir));
 
 /* =======================
    POSTGRES CLIENT
 ======================= */
-
 const pgClient = new Client({
   user: process.env.PG_USER || "postgres",
   host: process.env.PG_HOST || "localhost",
@@ -37,95 +37,21 @@ const pgClient = new Client({
 /* =======================
    MIDDLEWARE
 ======================= */
-
-// Use Helmet for security headers. During development we disable the
-// contentSecurityPolicy so inline scripts and `onload` attributes (used
-// for debugging) continue to work — in production CSP should be enabled.
-const helmetOptions =
-  process.env.NODE_ENV === "production" ? {} : { contentSecurityPolicy: false };
-app.use(helmet(helmetOptions));
 app.use(express.json());
 app.use(cookieParser());
-
-app.use(
-  cors({
-    origin: true,
-    credentials: true,
-  })
-);
-
-// Development request logger - helps confirm which files the browser requests
-if (process.env.NODE_ENV !== "production") {
-  app.use((req, res, next) => {
-    // only log static-ish requests for noise reduction
-    if (
-      req.url.startsWith("/styles") ||
-      req.url.startsWith("/scripts") ||
-      req.url.startsWith("/assets")
-    ) {
-      console.log(`[REQ] ${req.method} ${req.url}`);
-    }
-    next();
-  });
-}
-
-/* =======================
-   STATIC FRONTEND
-======================= */
-
-const frontendStaticDir = path.join(__dirname, "../frontend");
-const isProd = process.env.NODE_ENV === "production";
-const staticOptions = isProd
-  ? { maxAge: "1d" }
-  : {
-      etag: false,
-      maxAge: 0,
-      setHeaders: (res) => {
-        res.setHeader(
-          "Cache-Control",
-          "no-store, no-cache, must-revalidate, proxy-revalidate"
-        );
-      },
-    };
-
-// Serve files at root (e.g. /styles/*, /scripts/*, /assets/*)
-app.use(express.static(frontendStaticDir, staticOptions));
-// Also support the `/frontend` prefix (some pages used that earlier)
-app.use("/frontend", express.static(frontendStaticDir, staticOptions));
-
-// Serve main HTML
-app.get("/", (req, res) => {
-  res.sendFile(path.join(frontendStaticDir, "body.html"));
-});
-
-/* =======================
-   RATE LIMITING
-======================= */
-
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-});
-
-app.use("/api/auth", authLimiter);
+app.use(cors({ origin: true, credentials: true }));
 
 /* =======================
    AUTH HELPERS
 ======================= */
-
 function requireAuth(req, res, next) {
   const auth = req.headers.authorization;
   let token = null;
 
-  if (auth && auth.startsWith("Bearer ")) {
-    token = auth.split(" ")[1];
-  } else if (req.cookies?.token) {
-    token = req.cookies.token;
-  }
+  if (auth && auth.startsWith("Bearer ")) token = auth.split(" ")[1];
+  else if (req.cookies?.token) token = req.cookies.token;
 
-  if (!token) {
-    return res.status(401).json({ error: "authorization required" });
-  }
+  if (!token) return res.status(401).json({ error: "authorization required" });
 
   try {
     req.user = jwt.verify(token, JWT_SECRET);
@@ -136,43 +62,218 @@ function requireAuth(req, res, next) {
 }
 
 /* =======================
-   AUTH ROUTES
+   PAYMENT ROUTES
 ======================= */
-
-// Admin login
-app.post("/api/auth/login", async (req, res) => {
-  const { username, password } = req.body;
-
-  if (username !== ADMIN_USER || password !== ADMIN_PASS) {
-    return res.status(401).json({ error: "invalid credentials" });
-  }
-
-  const token = jwt.sign({ user: ADMIN_USER, role: "admin" }, JWT_SECRET, {
-    expiresIn: "1h",
-  });
-
-  res.json({ token });
+app.get("/api/config/paystack", (req, res) => {
+  res.json({ key: process.env.PAYSTACK_PUBLIC_KEY });
 });
 
-// User login (PostgreSQL)
+// Save Payment
+app.post("/api/payments/save", requireAuth, async (req, res) => {
+  try {
+    const { reference, amount } = req.body;
+    const { username } = req.user;
+
+    const check = await pgClient.query(
+      "SELECT * FROM payments_pg WHERE reference = $1",
+      [reference]
+    );
+    if (check.rows.length > 0) {
+      return res.json({ message: "Payment already recorded" });
+    }
+
+    // Note: payments_pg uses 'student', registrations_pg uses 'student_username'
+    await pgClient.query(
+      "INSERT INTO payments_pg (student, amount, reference, status) VALUES ($1, $2, $3, 'success')",
+      [username, amount, reference]
+    );
+
+    res.json({ message: "Payment saved successfully" });
+  } catch (err) {
+    console.error("Payment Save Error:", err);
+    res.status(500).json({ error: "Could not save payment" });
+  }
+});
+
+// Get Total Fees
+app.get("/api/payments/total/:username", requireAuth, async (req, res) => {
+  try {
+    const { username } = req.params;
+    const result = await pgClient.query(
+      "SELECT SUM(amount) as total FROM payments_pg WHERE student = $1",
+      [username]
+    );
+    const total = result.rows[0].total || 0;
+    res.json({ total: parseInt(total) });
+  } catch (err) {
+    console.error("Get Fees Error:", err);
+    res.status(500).json({ error: "Could not fetch fees" });
+  }
+});
+
+/* =======================
+   DASHBOARD STATS
+======================= */
+app.get("/api/dashboard/stats/:username", requireAuth, async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    // 1. Count Results (using 'student' column)
+    const resultsCount = await pgClient.query(
+      "SELECT COUNT(*) FROM results_pg WHERE student = $1",
+      [username]
+    );
+
+    // 2. Count Courses (using 'student_username' column)
+    const coursesCount = await pgClient.query(
+      "SELECT COUNT(*) FROM registrations_pg WHERE student_username = $1",
+      [username]
+    );
+
+    res.json({
+      results: parseInt(resultsCount.rows[0].count),
+      courses: parseInt(coursesCount.rows[0].count),
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Could not fetch stats" });
+  }
+});
+
+/* =======================
+   COURSE REGISTRATION ROUTES
+======================= */
+
+// 1. REGISTER (Add Course)
+app.post("/api/courses/register", requireAuth, async (req, res) => {
+  try {
+    const { course_code, course_title, units } = req.body;
+    const { username } = req.user;
+
+    // Check existing using 'student_username'
+    const check = await pgClient.query(
+      "SELECT * FROM registrations_pg WHERE student_username = $1 AND course_code = $2",
+      [username, course_code]
+    );
+
+    if (check.rows.length > 0) {
+      return res.status(400).json({ error: "Course already registered" });
+    }
+
+    // Insert using 'student_username'
+    await pgClient.query(
+      "INSERT INTO registrations_pg (student_username, course_code, course_title, units) VALUES ($1, $2, $3, $4)",
+      [username, course_code, course_title, units]
+    );
+
+    res.json({ message: "Course registered successfully" });
+  } catch (err) {
+    console.error("Reg Error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+// 2. DELETE (Remove Course)
+app.delete("/api/courses/register", requireAuth, async (req, res) => {
+  try {
+    const { course_code } = req.body;
+    const { username } = req.user;
+
+    await pgClient.query(
+      "DELETE FROM registrations_pg WHERE student_username = $1 AND course_code = $2",
+      [username, course_code]
+    );
+
+    res.json({ message: "Course removed successfully" });
+  } catch (err) {
+    console.error("Delete Error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+// 3. GET Registered Courses
+app.get("/api/courses/registered/:username", requireAuth, async (req, res) => {
+  try {
+    const { username } = req.params;
+    const { rows } = await pgClient.query(
+      "SELECT * FROM registrations_pg WHERE student_username = $1",
+      [username]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error("Get Courses Error:", err);
+    res.status(500).json({ error: "Server error fetching courses" });
+  }
+});
+
+/* =======================
+   RESULTS ROUTES
+======================= */
+app.post("/api/results", requireAuth, async (req, res) => {
+  try {
+    const { student, course_code, grade, unit } = req.body;
+    if (!student || !course_code || !grade || !unit) {
+      return res.status(400).json({ error: "Missing fields" });
+    }
+
+    await pgClient.query(
+      "INSERT INTO results_pg (student, course_code, grade, unit) VALUES ($1, $2, $3, $4)",
+      [student, course_code, grade, unit]
+    );
+
+    res.json({ message: "Result saved successfully" });
+  } catch (err) {
+    console.error("Upload error:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+app.get("/api/results/:studentId", requireAuth, async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const { rows } = await pgClient.query(
+      "SELECT * FROM results_pg WHERE student = $1 ORDER BY created_at DESC",
+      [studentId]
+    );
+    res.json({ results: rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Could not fetch results" });
+  }
+});
+
+app.get("/api/results/count/:username", requireAuth, async (req, res) => {
+  try {
+    const { username } = req.params;
+    const { rows } = await pgClient.query(
+      "SELECT COUNT(*) FROM results_pg WHERE student = $1",
+      [username]
+    );
+    res.json({ count: parseInt(rows[0].count) });
+  } catch (err) {
+    console.error("Count Error:", err);
+    res.status(500).json({ error: "Error counting results" });
+  }
+});
+
+/* =======================
+   AUTH ROUTES
+======================= */
 app.post("/api/auth/user-login", async (req, res) => {
   try {
     const { username, password } = req.body;
-
     const { rows } = await pgClient.query(
       "SELECT * FROM users_pg WHERE username = $1",
       [username]
     );
-
     const user = rows[0];
-    if (!user) {
+
+    if (!user)
       return res.status(401).json({ error: "invalid username or password" });
-    }
 
     const ok = await bcrypt.compare(password, user.password_hash);
-    if (!ok) {
+    if (!ok)
       return res.status(401).json({ error: "invalid username or password" });
-    }
 
     const token = jwt.sign(
       { id: user.id, username: user.username },
@@ -182,82 +283,56 @@ app.post("/api/auth/user-login", async (req, res) => {
 
     res.json({ token });
   } catch (err) {
-    console.error("user-login error:", err);
+    console.error("login error:", err);
     res.status(500).json({ error: "server error" });
   }
 });
 
-/* =======================
-   RESULTS ROUTES (PG ONLY)
-======================= */
-
-app.use("/uploads", express.static("uploads"));
-
-app.use("/api/results", require("./routes/resultRoutes"));
-
-app.post("/api/results", requireAuth, async (req, res) => {
+app.post("/api/auth/public-register", async (req, res) => {
   try {
-    const results = req.body.results || req.body;
-    if (!Array.isArray(results) || results.length === 0) {
-      return res.status(400).json({ error: "results array required" });
-    }
+    const { username, password } = req.body;
+    if (!username || !password)
+      return res.status(400).json({ error: "All fields required" });
 
-    for (const r of results) {
-      await pgClient.query(
-        `
-        INSERT INTO results_pg (student, course_code, grade, unit)
-        VALUES ($1,$2,$3,$4)
-        `,
-        [r.student, r.courseCode, r.grade, r.unit ? Number(r.unit) : null]
-      );
-    }
+    const hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
-    res.status(201).json({ ok: true });
-  } catch (err) {
-    console.error("POST /api/results error:", err);
-    res.status(500).json({ error: "server error" });
-  }
-});
-
-app.get("/api/results", async (req, res) => {
-  try {
     const { rows } = await pgClient.query(
-      "SELECT * FROM results_pg ORDER BY created_at DESC LIMIT 1000"
+      "INSERT INTO users_pg (username, password_hash) VALUES ($1, $2) RETURNING id, username",
+      [username, hash]
     );
-    res.json(rows);
+
+    res.json({ message: "User created", user: rows[0] });
   } catch (err) {
-    console.error("GET /api/results error:", err);
-    res.status(500).json({ error: "server error" });
+    console.error("register error:", err);
+
+    // Check if it's a "Unique Violation" (Postgres error code 23505)
+    if (err.code === "23505") {
+      return res
+        .status(400)
+        .json({ error: "Username already exists. Please pick another." });
+    }
+
+    res.status(500).json({ error: "Database error during registration." });
   }
 });
 
-/* =======================
-   PAYSTACK ROUTES
-======================= */
-
-const paymentRoutes = require("./routes/paymentRoutes");
-app.use("/api/payments", paymentRoutes);
+app.get("/", (req, res) => {
+  res.sendFile(path.join(frontendStaticDir, "index.html"));
+});
 
 /* =======================
-   START SERVER
+   POSTGRES INIT & START
 ======================= */
-async function initPostgres() {
+(async function start() {
   try {
+    await pgClient.connect();
+
+    // Tables
     await pgClient.query(`
       CREATE TABLE IF NOT EXISTS users_pg (
         id SERIAL PRIMARY KEY,
         username TEXT UNIQUE NOT NULL,
-        email TEXT,
         password_hash TEXT NOT NULL,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
-      );
-    `);
-
-    await pgClient.query(`
-      CREATE TABLE IF NOT EXISTS courses_pg (
-        id SERIAL PRIMARY KEY,
-        name TEXT NOT NULL,
-        code TEXT UNIQUE NOT NULL,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
       );
     `);
@@ -265,7 +340,7 @@ async function initPostgres() {
     await pgClient.query(`
       CREATE TABLE IF NOT EXISTS results_pg (
         id SERIAL PRIMARY KEY,
-        student TEXT NOT NULL,
+        student TEXT NOT NULL, 
         course_code TEXT NOT NULL,
         grade TEXT NOT NULL,
         unit INTEGER,
@@ -273,25 +348,34 @@ async function initPostgres() {
       );
     `);
 
-    console.log("PostgreSQL tables created/checked.");
+    await pgClient.query(`
+      CREATE TABLE IF NOT EXISTS registrations_pg (
+        id SERIAL PRIMARY KEY,
+        student_username TEXT NOT NULL,
+        course_code TEXT NOT NULL,
+        course_title TEXT,
+        units INTEGER,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+      );
+    `);
+
+    await pgClient.query(`
+      CREATE TABLE IF NOT EXISTS payments_pg (
+        id SERIAL PRIMARY KEY,
+        student TEXT NOT NULL, 
+        reference TEXT UNIQUE NOT NULL,
+        amount INTEGER NOT NULL,
+        status TEXT DEFAULT 'success',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+      );
+    `);
+
+    console.log("Postgres Database & Tables Ready.");
+    app.listen(PORT, () =>
+      console.log(`Server running on http://localhost:${PORT}`)
+    );
   } catch (err) {
-    console.error("PostgreSQL init error:", err);
-    throw err;
-  }
-}
-
-(async function start() {
-  try {
-    await pgClient.connect();
-    console.log("Connected to PostgreSQL");
-
-    await initPostgres(); // ✅ creates tables
-
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
-  } catch (err) {
-    console.error("Startup error:", err);
+    console.error("Database connection error:", err);
     process.exit(1);
   }
 })();
