@@ -39,7 +39,6 @@
     "academic-fees",
     "documents",
     "lecturers",
-
     "profile",
     "signout",
   ];

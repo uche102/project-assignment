@@ -76,7 +76,7 @@ app.post("/api/payments/save", requireAuth, async (req, res) => {
 
     const check = await pgClient.query(
       "SELECT * FROM payments_pg WHERE reference = $1",
-      [reference]
+      [reference],
     );
     if (check.rows.length > 0) {
       return res.json({ message: "Payment already recorded" });
@@ -85,7 +85,7 @@ app.post("/api/payments/save", requireAuth, async (req, res) => {
     // Note: payments_pg uses 'student', registrations_pg uses 'student_username'
     await pgClient.query(
       "INSERT INTO payments_pg (student, amount, reference, status) VALUES ($1, $2, $3, 'success')",
-      [username, amount, reference]
+      [username, amount, reference],
     );
 
     res.json({ message: "Payment saved successfully" });
@@ -101,7 +101,7 @@ app.get("/api/payments/total/:username", requireAuth, async (req, res) => {
     const { username } = req.params;
     const result = await pgClient.query(
       "SELECT SUM(amount) as total FROM payments_pg WHERE student = $1",
-      [username]
+      [username],
     );
     const total = result.rows[0].total || 0;
     res.json({ total: parseInt(total) });
@@ -121,13 +121,13 @@ app.get("/api/dashboard/stats/:username", requireAuth, async (req, res) => {
     // 1. Count Results (using 'student' column)
     const resultsCount = await pgClient.query(
       "SELECT COUNT(*) FROM results_pg WHERE student = $1",
-      [username]
+      [username],
     );
 
     // 2. Count Courses (using 'student_username' column)
     const coursesCount = await pgClient.query(
       "SELECT COUNT(*) FROM registrations_pg WHERE student_username = $1",
-      [username]
+      [username],
     );
 
     res.json({
@@ -153,7 +153,7 @@ app.post("/api/courses/register", requireAuth, async (req, res) => {
     // Check existing using 'student_username'
     const check = await pgClient.query(
       "SELECT * FROM registrations_pg WHERE student_username = $1 AND course_code = $2",
-      [username, course_code]
+      [username, course_code],
     );
 
     if (check.rows.length > 0) {
@@ -163,7 +163,7 @@ app.post("/api/courses/register", requireAuth, async (req, res) => {
     // Insert using 'student_username'
     await pgClient.query(
       "INSERT INTO registrations_pg (student_username, course_code, course_title, units) VALUES ($1, $2, $3, $4)",
-      [username, course_code, course_title, units]
+      [username, course_code, course_title, units],
     );
 
     res.json({ message: "Course registered successfully" });
@@ -181,7 +181,7 @@ app.delete("/api/courses/register", requireAuth, async (req, res) => {
 
     await pgClient.query(
       "DELETE FROM registrations_pg WHERE student_username = $1 AND course_code = $2",
-      [username, course_code]
+      [username, course_code],
     );
 
     res.json({ message: "Course removed successfully" });
@@ -197,7 +197,7 @@ app.get("/api/courses/registered/:username", requireAuth, async (req, res) => {
     const { username } = req.params;
     const { rows } = await pgClient.query(
       "SELECT * FROM registrations_pg WHERE student_username = $1",
-      [username]
+      [username],
     );
     res.json(rows);
   } catch (err) {
@@ -218,7 +218,7 @@ app.post("/api/results", requireAuth, async (req, res) => {
 
     await pgClient.query(
       "INSERT INTO results_pg (student, course_code, grade, unit) VALUES ($1, $2, $3, $4)",
-      [student, course_code, grade, unit]
+      [student, course_code, grade, unit],
     );
 
     res.json({ message: "Result saved successfully" });
@@ -233,7 +233,7 @@ app.get("/api/results/:studentId", requireAuth, async (req, res) => {
     const { studentId } = req.params;
     const { rows } = await pgClient.query(
       "SELECT * FROM results_pg WHERE student = $1 ORDER BY created_at DESC",
-      [studentId]
+      [studentId],
     );
     res.json({ results: rows });
   } catch (err) {
@@ -247,7 +247,7 @@ app.get("/api/results/count/:username", requireAuth, async (req, res) => {
     const { username } = req.params;
     const { rows } = await pgClient.query(
       "SELECT COUNT(*) FROM results_pg WHERE student = $1",
-      [username]
+      [username],
     );
     res.json({ count: parseInt(rows[0].count) });
   } catch (err) {
@@ -264,7 +264,7 @@ app.post("/api/auth/user-login", async (req, res) => {
     const { username, password } = req.body;
     const { rows } = await pgClient.query(
       "SELECT * FROM users_pg WHERE username = $1",
-      [username]
+      [username],
     );
     const user = rows[0];
 
@@ -275,10 +275,11 @@ app.post("/api/auth/user-login", async (req, res) => {
     if (!ok)
       return res.status(401).json({ error: "invalid username or password" });
 
+    // Include reg_no in the sign method payload
     const token = jwt.sign(
-      { id: user.id, username: user.username },
+      { id: user.id, username: user.username, reg_no: user.reg_no },
       JWT_SECRET,
-      { expiresIn: "2h" }
+      { expiresIn: "2h" },
     );
 
     res.json({ token });
@@ -290,28 +291,27 @@ app.post("/api/auth/user-login", async (req, res) => {
 
 app.post("/api/auth/public-register", async (req, res) => {
   try {
-    const { username, password } = req.body;
-    if (!username || !password)
+    const { username, password, reg_no } = req.body; // Add reg_no here
+    if (!username || !password || !reg_no)
+      // Ensure it is required
       return res.status(400).json({ error: "All fields required" });
 
     const hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
+    // Update the INSERT statement
     const { rows } = await pgClient.query(
-      "INSERT INTO users_pg (username, password_hash) VALUES ($1, $2) RETURNING id, username",
-      [username, hash]
+      "INSERT INTO users_pg (username, password_hash, reg_no) VALUES ($1, $2, $3) RETURNING id, username, reg_no",
+      [username, hash, reg_no],
     );
 
     res.json({ message: "User created", user: rows[0] });
   } catch (err) {
     console.error("register error:", err);
-
-    // Check if it's a "Unique Violation" (Postgres error code 23505)
     if (err.code === "23505") {
       return res
         .status(400)
-        .json({ error: "Username already exists. Please pick another." });
+        .json({ error: "Username or Reg Number already exists." });
     }
-
     res.status(500).json({ error: "Database error during registration." });
   }
 });
@@ -329,12 +329,13 @@ app.get("/", (req, res) => {
 
     // Tables
     await pgClient.query(`
-      CREATE TABLE IF NOT EXISTS users_pg (
-        id SERIAL PRIMARY KEY,
-        username TEXT UNIQUE NOT NULL,
-        password_hash TEXT NOT NULL,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
-      );
+CREATE TABLE IF NOT EXISTS users_pg (
+    id SERIAL PRIMARY KEY,
+    username TEXT UNIQUE NOT NULL,
+    reg_no TEXT UNIQUE, -- Add this line
+    password_hash TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+  );
     `);
 
     await pgClient.query(`
@@ -372,7 +373,7 @@ app.get("/", (req, res) => {
 
     console.log("Postgres Database & Tables Ready.");
     app.listen(PORT, () =>
-      console.log(`Server running on http://localhost:${PORT}`)
+      console.log(`Server running on http://localhost:${PORT}`),
     );
   } catch (err) {
     console.error("Database connection error:", err);

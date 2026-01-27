@@ -25,10 +25,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const payload = decodeToken(token);
     if (!payload) return;
 
+    // Ensure the username is available for the dashboard
     window.state = window.state || {};
     window.state.user = {
       id: payload.id,
-      username: payload.username,
+      username: payload.username || payload.name || "Student",
     };
   }
 
@@ -76,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Redirect after successful login
       localStorage.setItem("landingPage", "dashboard");
-      
+
       window.location.href = "../index.html";
     } catch (err) {
       console.error("Login error:", err);
@@ -109,14 +110,37 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       if (signupEl) return;
 
+      // 1. Hide the main login elements to make space
+      const loginElements = form.querySelectorAll(
+        "h1, .sub, #username, #password, #toggle, #signInBtn, .forgot-link, .small, .admin-btn",
+      );
+      loginElements.forEach((el) => (el.style.display = "none"));
+
+      // 2. Create the Signup Container
       signupEl = document.createElement("div");
+      signupEl.className = "signup-container";
       signupEl.innerHTML = `
-        <input id="signupUsername" placeholder="Choose username" />
-        <input id="signupPassword" type="password" placeholder="Choose password" />
-        <button id="createAccountBtn" type="button">Create account</button>
-        <div id="signupStatus"></div>
+        <h1 style="margin-bottom: 5px;">Create Account</h1>
+        <p class="sub" style="margin-bottom: 20px;">Enter your details to join the portal</p>
+        
+        <input id="signupUsername" placeholder="Choose Username" class="input-field" style="margin-bottom: 10px; width: 100%;" />
+        <input id="signupRegNo" placeholder="Registration Number (e.g. 2021/123456)" class="input-field" style="margin-bottom: 10px; width: 100%;" />
+        <input id="signupPassword" type="password" placeholder="Choose Password" class="input-field" style="margin-bottom: 10px; width: 100%;" />
+        
+        <button id="createAccountBtn" type="button" class="menu-item" style="width: 100%; margin-top: 10px;">Create Account</button>
+        <button id="cancelSignup" type="button" style="background:none; border:none; color:#007bff; cursor:pointer; margin-top:15px; width:100%;">Back to Login</button>
+        
+        <div id="signupStatus" style="margin-top: 10px; font-size: 0.9rem;"></div>
       `;
+
       form.appendChild(signupEl);
+
+      // --- ADDED: Cancel/Back Button Logic ---
+      signupEl.querySelector("#cancelSignup").addEventListener("click", () => {
+        signupEl.remove();
+        signupEl = null;
+        loginElements.forEach((el) => (el.style.display = "")); // Show login again
+      });
 
       const status = signupEl.querySelector("#signupStatus");
 
@@ -124,10 +148,12 @@ document.addEventListener("DOMContentLoaded", () => {
         .querySelector("#createAccountBtn")
         .addEventListener("click", async () => {
           const u = signupEl.querySelector("#signupUsername").value.trim();
+          const r = signupEl.querySelector("#signupRegNo").value.trim();
           const p = signupEl.querySelector("#signupPassword").value;
 
-          if (!u || !p) {
+          if (!u || !p || !r) {
             status.textContent = "All fields are required";
+            status.style.color = "red";
             return;
           }
 
@@ -135,26 +161,28 @@ document.addEventListener("DOMContentLoaded", () => {
             const res = await fetch(`${API_BASE}/api/auth/public-register`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ username: u, password: p }),
+              body: JSON.stringify({ username: u, password: p, reg_no: r }),
             });
 
             const data = await res.json();
 
             if (!res.ok) {
               status.textContent = data?.error || "Registration failed";
+              status.style.color = "red";
               return;
             }
 
             status.style.color = "green";
-            status.textContent = "Account created — please login";
+            status.textContent = "Success! Returning to login...";
 
-            document.getElementById("username").value = u;
-            document.getElementById("password").value = p;
-
+            // Auto-fill login and return
             setTimeout(() => {
+              document.getElementById("username").value = u;
+              document.getElementById("password").value = p;
               signupEl.remove();
               signupEl = null;
-            }, 1500);
+              loginElements.forEach((el) => (el.style.display = ""));
+            }, 2000);
           } catch (err) {
             console.error("Signup error:", err);
             status.textContent = "Network error";

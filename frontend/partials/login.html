@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../styles/styles.css" />
-    <title>Login</title>
+    <title>Login | Student Portal</title>
   </head>
 
   <body>
@@ -13,34 +13,43 @@
         <h1>Welcome Back</h1>
         <p class="sub">Login to access your student portal</p>
 
-        <input id="username" type="text" placeholder="Username" required />
-        <input id="password" type="password" placeholder="Password" required />
-        <span id="toggle">Show</span>
+        <div class="input-group">
+          <input id="username" type="text" placeholder="Username" required />
+        </div>
+
+        <div class="input-group" style="position: relative;">
+          <input id="password" type="password" placeholder="Password" required />
+          <span id="toggle" style="position: absolute; right: 10px; top: 12px; cursor: pointer; font-size: 0.8rem; color: #007bff;">Show</span>
+        </div>
 
         <div
           id="loginError"
           role="alert"
           aria-live="polite"
-          style="color: crimson; margin-top: 0.5rem"
+          style="color: crimson; margin-top: 0.5rem; font-size: 0.9rem; min-height: 1.2rem;"
         ></div>
 
         <a href="#" class="forgot-link">Forgot password?</a>
 
-        <button id="signInBtn" class="menu-item" type="submit">Sign in</button>
+        <button id="signInBtn" class="menu-item" type="submit" style="width: 100%; margin-top: 10px;">Sign in</button>
 
         <p class="small">
-          Dont have an account? <a href="#" class="signup">Sign up</a>
+          Don't have an account? <a href="#" class="signup">Sign up</a>
         </p>
+
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;" />
 
         <button
           type="button"
           class="btn admin-btn"
           onclick="window.location.href='admin.html'"
+          style="width: 100%; background: #6c757d; color: white;"
         >
           Login as Admin
         </button>
       </form>
     </main>
+    
     <script src="../scripts/login-client.js"></script>
   </body>
 </html>

@@ -99,7 +99,7 @@ function initPaystack() {
             alert("Payment Successful! Record saved to database.");
             payBtn.textContent = "Pay Again";
             payBtn.disabled = false;
-            payBtn.style.background = "#16a34a"; // UNN Green
+            payBtn.style.background = "#16a34a"; //  Green
 
             // Final refresh to ensure DB data matches LocalStorage
             window.dispatchEvent(new Event("statsUpdated"));
