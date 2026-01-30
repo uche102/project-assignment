@@ -42,21 +42,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // ============================
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    errEl.textContent = "";
 
-    const username = document.getElementById("username")?.value.trim();
+    // CHANGE: Get the value from the input (even if the ID is still 'username')
+    const reg_no = document.getElementById("username")?.value.trim();
     const password = document.getElementById("password")?.value;
-
-    if (!username || !password) {
-      errEl.textContent = "Username and password are required";
-      return;
-    }
 
     try {
       const res = await fetch(`${API_BASE}/api/auth/user-login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        // CHANGE: Send reg_no
+        body: JSON.stringify({ reg_no, password }),
       });
 
       const data = await res.json();

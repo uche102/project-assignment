@@ -1,58 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <div class="partial" data-name="profile">
-      <div class="partial-nav">
-        <button data-page="profile" class="menu-item dynamic">Profile</button>
-      </div>
+<div class="partial" data-name="profile">
+  <div class="partial-nav">
+    <button data-page="profile" class="menu-item dynamic">Profile</button>
+  </div>
 
-      <div
-        class="partial-content"
-        data-page="profile"
-        data-title="Profile"
-        style="display: none"
-      >
-        <section id="profile" class="page">
-          <h3>Profile</h3>
-          <div class="panel profile-grid">
-            <div class="profile-card">
-              <img src="/course.png" alt="avatar" class="profile-avatar" />
-              <h4 id="profileName">NWAKOR UCHE</h4>
-              <p id="profileMatric">Matric: UNN/CS/2020/1234</p>
-              <p id="profileDept">Dept: Computer Science</p>
-              <p id="profileLevel">Level: 400</p>
-              <div class="id-card">
-                <div class="id-row">
-                  <strong>Student ID:</strong><span id="idCode">S-123456</span>
-                </div>
-                <div class="id-row">
-                  <strong>QR:</strong> <span class="qr">[QR]</span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h4>Edit Contact</h4>
-              <form id="profileForm" class="form-block">
-                <label>Phone</label>
-                <input id="profilePhone" placeholder="+234 81x xxx xxxx" />
-                <label>Email</label>
-                <input id="profileEmail" placeholder="you@domain.com" />
-                <label>Address</label>
-                <textarea id="profileAddress" rows="3"></textarea>
-                <button id="saveProfile" class="btn primary">
-                  Save Profile
-                </button>
-              </form>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-  </body>
-</html>
+  <div class="partial-content" data-page="profile" data-title="Student Profile" style="display: none">
+    <section id="profile" class="page">
+      <h3>Student Profile</h3>
+      <div class="panel profile-grid">
+        </div>
+    </section>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -32,8 +32,94 @@
         <button id="fetchStudentsBtn">Fetch Enrolled Students</button>
       </div>
     </div>
+    <div
+      class="panel"
+      style="margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px"
+    >
+      <h3>Upload Lecturers (CSV)</h3>
+      <p class="muted">CSV Headers: Name, Email, Office, Courses</p>
 
-    <script src="../scripts/admin-auth.js"></script>
+      <input type="file" id="lecturerFile" accept=".csv" />
+      <button
+        id="uploadLecturersBtn"
+        style="
+          background: #28a745;
+          color: white;
+          border: none;
+          padding: 5px 15px;
+          border-radius: 4px;
+          cursor: pointer;
+        "
+      >
+        Upload Lecturers
+      </button>
+    </div>
+    <div
+      class="panel"
+      style="margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px"
+    >
+      <h3>🎓 Assign Courses to Lecturers</h3>
+      <p class="muted">Link a course code to a specific lecturer.</p>
+
+      <div
+        style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap"
+      >
+        <div style="flex: 1; min-width: 200px">
+          <label style="display: block; margin-bottom: 5px; font-weight: bold"
+            >Select Course</label
+          >
+          <select
+            id="assignCourseSelect"
+            style="
+              width: 100%;
+              padding: 10px;
+              border: 1px solid #ccc;
+              border-radius: 4px;
+            "
+          >
+            <option value="">Loading courses...</option>
+          </select>
+        </div>
+
+        <div style="flex: 1; min-width: 200px">
+          <label style="display: block; margin-bottom: 5px; font-weight: bold"
+            >Select Lecturer</label
+          >
+          <select
+            id="assignLecturerSelect"
+            style="
+              width: 100%;
+              padding: 10px;
+              border: 1px solid #ccc;
+              border-radius: 4px;
+            "
+          >
+            <option value="">Loading lecturers...</option>
+          </select>
+        </div>
+
+        <button
+          onclick="assignCourse()"
+          style="
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            height: 42px;
+          "
+        >
+          Assign Now
+        </button>
+      </div>
+
+      <p id="assignStatus" style="margin-top: 10px; font-size: 0.9rem"></p>
+    </div>
+
+    <footer>
+      &copy; 2024 UNN Portal. Developed by Uche.
+    </footer>
     <script src="../scripts/admin.js"></script>
     <script src="../scripts/body.js"></script>
   </body>

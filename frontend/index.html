@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
@@ -31,8 +31,8 @@
               <div class="user">
                 <img src="/course.png" alt="avatar" class="avatar" />
                 <div class="user-info">
-                  <div id="topbarUsername">NWAKOR U.</div>
-                  <div class="meta">400 Level — Computer Science</div>
+                  <div id="topbarUsername"></div>
+                  <div class="meta"></div>
                 </div>
               </div>
             </div>
@@ -61,28 +61,22 @@
 
             <div id="pagesContainer"></div>
           </section>
-
-          
         </main>
       </div>
     </div>
-    
-
-
+    <script>
+      window.API_BASE = "http://localhost:4000";
+    </script>
     <!-- Paystack library -->
     <script src="https://js.paystack.co/v1/inline.js"></script>
 
     <!-- JS Scripts -->
-   <body>
-  ...
-  <script src="/scripts/nav-loader.js"></script>
-  <script src="/scripts/paystack.js"></script>
-  
-  <script src="/scripts/results-client.js"></script>
-  <script src="/scripts/course-reg-client.js"></script>
-  <script src="/scripts/dashboard-client.js"></script>
-  <script src="/scripts/borrow-client.js"></script>
-</body>
-    <!-- inline behavior moved to body.js -->
+    <script src="/scripts/nav-loader.js"></script>
+    <script src="/scripts/paystack.js"></script>
+    <script src="/scripts/results-client.js"></script>
+    <script src="/scripts/lecturer-client.js"></script>
+    <script src="/scripts/course-reg-client.js"></script>
+    <script src="/scripts/dashboard-client.js"></script>
+    <script src="/scripts/borrow-client.js"></script>
   </body>
 </html>

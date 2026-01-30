@@ -69,45 +69,111 @@ app.get("/api/config/paystack", (req, res) => {
 });
 
 // Save Payment
-app.post("/api/payments/save", requireAuth, async (req, res) => {
+app.get("/api/payments/total/:regNo", requireAuth, async (req, res) => {
   try {
-    const { reference, amount } = req.body;
-    const { username } = req.user;
-
-    const check = await pgClient.query(
-      "SELECT * FROM payments_pg WHERE reference = $1",
-      [reference],
-    );
-    if (check.rows.length > 0) {
-      return res.json({ message: "Payment already recorded" });
-    }
-
-    // Note: payments_pg uses 'student', registrations_pg uses 'student_username'
-    await pgClient.query(
-      "INSERT INTO payments_pg (student, amount, reference, status) VALUES ($1, $2, $3, 'success')",
-      [username, amount, reference],
-    );
-
-    res.json({ message: "Payment saved successfully" });
-  } catch (err) {
-    console.error("Payment Save Error:", err);
-    res.status(500).json({ error: "Could not save payment" });
-  }
-});
-
-// Get Total Fees
-app.get("/api/payments/total/:username", requireAuth, async (req, res) => {
-  try {
-    const { username } = req.params;
+    const { regNo } = req.params;
     const result = await pgClient.query(
       "SELECT SUM(amount) as total FROM payments_pg WHERE student = $1",
-      [username],
+      [regNo],
     );
     const total = result.rows[0].total || 0;
     res.json({ total: parseInt(total) });
   } catch (err) {
     console.error("Get Fees Error:", err);
     res.status(500).json({ error: "Could not fetch fees" });
+  }
+});
+
+/* =======================
+   LECTURER DIRECTORY (DYNAMIC LINK)
+======================= */
+app.get("/api/lecturers", async (req, res) => {
+  try {
+    // This query grabs the Lecturer + A list of their courses
+    const query = `
+      SELECT 
+        l.id, 
+        l.name, 
+        l.email, 
+        l.office, 
+        l.image_url,
+        COALESCE(
+          json_agg(
+            json_build_object('code', c.code, 'title', c.title)
+          ) FILTER (WHERE c.code IS NOT NULL), 
+          '[]'
+        ) as courses
+      FROM lecturers_pg l
+      LEFT JOIN courses_directory c ON l.id = c.lecturer_id
+      GROUP BY l.id
+      ORDER BY l.name ASC;
+    `;
+
+    const { rows } = await pgClient.query(query);
+    res.json(rows);
+  } catch (err) {
+    console.error("Lecturer Fetch Error:", err);
+    res.status(500).json({ error: "Could not fetch lecturers" });
+  }
+});
+app.post("/api/admin/lecturers-upload", requireAuth, async (req, res) => {
+  try {
+    const { lecturers } = req.body; // Expecting an array of objects
+
+    if (!Array.isArray(lecturers)) {
+      return res.status(400).json({ error: "Invalid data format" });
+    }
+
+    // Using a transaction for safety
+    await pgClient.query("BEGIN");
+    for (const lec of lecturers) {
+      await pgClient.query(
+        "INSERT INTO lecturers_pg (name, email, office, courses) VALUES ($1, $2, $3, $4)",
+        [lec.name, lec.email, lec.office, lec.courses],
+      );
+    }
+    await pgClient.query("COMMIT");
+
+    res.json({
+      message: `Successfully uploaded ${lecturers.length} lecturers.`,
+    });
+  } catch (err) {
+    await pgClient.query("ROLLBACK");
+    console.error("Upload error:", err);
+    res.status(500).json({ error: "Database error during upload" });
+  }
+});
+/* =======================
+   ADMIN: COURSE ASSIGNMENT
+======================= */
+
+// 1. Get ALL Courses (for the admin dropdown)
+app.get("/api/admin/courses", requireAuth, async (req, res) => {
+  try {
+    const { rows } = await pgClient.query(
+      "SELECT * FROM courses_directory ORDER BY code ASC",
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: "Could not fetch courses" });
+  }
+});
+
+// 2. Assign a Course to a Lecturer
+app.post("/api/admin/assign-course", requireAuth, async (req, res) => {
+  try {
+    const { course_code, lecturer_id } = req.body;
+
+    // The logic is simple: UPDATE the course table to point to this lecturer
+    await pgClient.query(
+      "UPDATE courses_directory SET lecturer_id = $1 WHERE code = $2",
+      [lecturer_id, course_code],
+    );
+
+    res.json({ message: "Course assigned successfully!" });
+  } catch (err) {
+    console.error("Assign Error:", err);
+    res.status(500).json({ error: "Database error" });
   }
 });
 
@@ -228,12 +294,12 @@ app.post("/api/results", requireAuth, async (req, res) => {
   }
 });
 
-app.get("/api/results/:studentId", requireAuth, async (req, res) => {
+app.get("/api/results/:regNo", requireAuth, async (req, res) => {
   try {
-    const { studentId } = req.params;
+    const { regNo } = req.params; // The frontend will now pass the Reg Number
     const { rows } = await pgClient.query(
       "SELECT * FROM results_pg WHERE student = $1 ORDER BY created_at DESC",
-      [studentId],
+      [regNo],
     );
     res.json({ results: rows });
   } catch (err) {
@@ -261,31 +327,32 @@ app.get("/api/results/count/:username", requireAuth, async (req, res) => {
 ======================= */
 app.post("/api/auth/user-login", async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { reg_no, password } = req.body;
+    // Find the user by Registration Number
     const { rows } = await pgClient.query(
-      "SELECT * FROM users_pg WHERE username = $1",
-      [username],
+      "SELECT * FROM users_pg WHERE reg_no = $1",
+      [reg_no],
     );
     const user = rows[0];
 
-    if (!user)
-      return res.status(401).json({ error: "invalid username or password" });
+    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
 
-    const ok = await bcrypt.compare(password, user.password_hash);
-    if (!ok)
-      return res.status(401).json({ error: "invalid username or password" });
-
-    // Include reg_no in the sign method payload
+    // SIGN THE TOKEN WITH BOTH IDENTITY AND NAME
     const token = jwt.sign(
-      { id: user.id, username: user.username, reg_no: user.reg_no },
+      {
+        id: user.id,
+        username: user.username, // This is the name you want to display
+        reg_no: user.reg_no, // This is the ID for queries
+      },
       JWT_SECRET,
       { expiresIn: "2h" },
     );
 
     res.json({ token });
   } catch (err) {
-    console.error("login error:", err);
-    res.status(500).json({ error: "server error" });
+    res.status(500).json({ error: "Server error" });
   }
 });
 

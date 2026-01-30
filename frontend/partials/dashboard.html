@@ -31,6 +31,31 @@
         <div class="card">
           <div class="card-title">CGPA</div>
           <div id="cgpaCard" class="card-value">0.00</div>
+          <div
+            class="cgpa-visualizer-container"
+            style="
+              margin-top: 10px;
+              width: 100%;
+              background: #eee;
+              border-radius: 10px;
+              height: 10px;
+              overflow: hidden;
+            "
+          >
+            <div
+              id="cgpaProgressBar"
+              style="
+                width: 0%;
+                height: 100%;
+                transition: width 1s ease-in-out;
+                background: #0a8a3a;
+              "
+            ></div>
+          </div>
+          <p
+            id="cgpaRemark"
+            style="font-size: 0.8rem; margin-top: 5px; font-weight: bold"
+          ></p>
         </div>
       </div>
 

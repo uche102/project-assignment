@@ -1,177 +1,142 @@
 :root {
-  --login-bg: linear-gradient(135deg, #f7fbf7 0%, #ffffff 100%);
-  --login-accent: #0a8a3a;
-  --login-soft: #e9f6ec;
+  /* Updated Palette: Cleaner Greens and Deep Teals */
+  --unn-green: #0a8a3a;
+  --unn-green-hover: #086e2e;
+  --unn-soft: #f0f9f2;
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --text-main: #1a1a1a;
+  --text-muted: #64748b;
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
 }
 
-/* Base reset for this sheet */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-html,
-body {
-  height: 100%;
-}
-body {
-  font-family:
-    Inter,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    Roboto,
-    "Helvetica Neue",
-    Arial;
-  background:
-    radial-gradient(
-      circle at 10% 10%,
-      rgba(10, 138, 58, 0.04),
-      transparent 20%
-    ),
-    #f6faf6;
-  -webkit-font-smoothing: antialiased;
+  transition: all 0.3s ease; /* Makes every hover effect smooth */
 }
 
-/* Main wrapper */
-main {
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  /* Premium Mesh Gradient Background */
+  background: 
+    radial-gradient(at 0% 0%, rgba(10, 138, 58, 0.07) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(43, 122, 184, 0.05) 0px, transparent 50%),
+    #ffffff;
+  color: var(--text-main);
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  padding: 24px;
-}
-.signup-container input {
-  width: 100% !important;
-  padding: 12px !important;
-  border: 1px solid #ddd !important;
-  border-radius: 4px !important;
-  display: block !important;
-  box-sizing: border-box !important;
+  line-height: 1.6;
 }
 
-/* Login Card */
-/* Find and update these properties in your styles.css */
-.login-card {
+/* The Login/Signup Card Container */
+.login-card, .signup-container {
   width: 100%;
-  max-width: 400px;
-  padding: 2rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-
-  /* CHANGE THIS: Ensure height is not fixed */
-  height: auto;
-  min-height: 450px; /* Optional: gives it a good base size */
-
-  display: flex;
-  flex-direction: column;
-  gap: 1rem; /* This ensures spacing between inputs automatically */
-  height: auto !important;
-  overflow: visible !important;
+  max-width: 420px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px); /* Glass effect */
+  padding: 2.5rem;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: var(--shadow-lg);
+  position: relative;
 }
 
-/* Ensure all inputs look consistent */
-.login-card input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-sizing: border-box; /* Crucial so padding doesn't break width */
-}
-
-/* Heading */
-.login-card h1 {
-  margin-bottom: 6px;
-  color: var(--login-accent);
-  font-size: 1.5rem;
+/* Better Headings */
+h1 {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--unn-green);
+  letter-spacing: -0.025em;
+  margin-bottom: 0.5rem;
 }
 
 .sub {
-  margin-bottom: 18px;
-  color: var(--text-muted, #666);
   font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
 }
 
-/* Inputs */
-
-.login-card input:focus {
-  border-color: var(--login-accent);
-  box-shadow: 0 6px 18px rgba(10, 138, 58, 0.06);
+/* Form Groups & Inputs */
+.input-group {
+  margin-bottom: 1.25rem;
+  position: relative;
 }
 
-/* Forgot password */
-.forgot-link {
-  text-align: right;
-  font-size: 14px;
-  color: #444;
-  text-decoration: none;
-  margin-bottom: 20px;
-}
-#toggle {
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 6px;
-  padding: 4px 8px;
-  position: absolute;
-  right: 18px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  font-size: 13px;
-  color: var(--login-accent);
-  background: var(--login-soft);
+label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #475569;
 }
 
-.forgot-link:hover {
-  color: blue;
-}
-
-/* Buttons */
-.btn {
+input {
   width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  margin: 8px 0;
+  padding: 0.85rem 1rem;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  outline: none;
 }
 
-/* Updated Login Button Styling to Match nav.css */
+input:focus {
+  border-color: var(--unn-green);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(10, 138, 58, 0.1);
+}
 
-/* Main login button */
+/* Modern Button Styling */
 .primary-btn {
-  background: var(--login-accent);
-  color: #fff;
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  transition:
-    transform 150ms ease,
-    box-shadow 150ms;
+  width: 100%;
+  padding: 1rem;
+  background: var(--unn-green);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(10, 138, 58, 0.2);
+  margin-top: 1rem;
 }
+
 .primary-btn:hover {
+  background: var(--unn-green-hover);
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(10, 138, 58, 0.12);
+  box-shadow: 0 8px 20px rgba(10, 138, 58, 0.3);
 }
 
-/* Admin button */
-.admin-btn {
-  background: #2b7ab8;
-  color: #fff;
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
+/* Show/Hide Password Toggle */
+#toggle {
+  position: absolute;
+  right: 12px;
+  top: 40px; /* Aligned with label spacing */
+  background: var(--unn-soft);
+  color: var(--unn-green);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-transform: uppercase;
 }
 
-/* Signup text */
+/* Links and Extras */
 .small {
-  margin-top: 14px;
-  font-size: 13px;
-  text-align: center;
+  margin-top: 1.5rem;
+  color: var(--text-muted);
 }
+
 .small a {
-  color: var(--login-accent);
+  color: var(--unn-green);
+  font-weight: 700;
   text-decoration: none;
 }
+
 .small a:hover {
   text-decoration: underline;
 }

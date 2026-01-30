@@ -1,182 +1,230 @@
 /* === VARIABLES & THEME === */
 :root {
   /* Brand Colors */
-  --primary: #2d7a46;       /* UNN Green */
-  --primary-light: #e8f5e9; 
-  --bg-body: #f3f3f7;       /* Light Purple/Grey background */
-  --bg-sidebar: #ffffff;
-  --text-main: #333333;     
-  --text-muted: #777777;
-  --border: #eaeaea;
-  
-  /* Dashboard Cards (Screenshot Colors) */
-  --card-purple: #7e7db0;
-  --card-blue: #709fdc;
-  --card-teal: #57c1a6;
-  
-  /* Dimensions */
-  --sidebar-width: 260px;
-  --header-height: 70px;
-  --radius: 10px;
+  --primary: #0a8a3a; /* UNN Green (Updated to match styles.css) */
+  --primary-glow: rgba(10, 138, 58, 0.15);
+  --bg-body: #f8fafc;
+  --bg-sidebar: rgba(255, 255, 255, 0.8);
+  --glass: rgba(255, 255, 255, 0.9);
+
+  /* Modern Dashboard Gradients */
+  --grad-purple: linear-gradient(135deg, #8e8cd8 0%, #7e7db0 100%);
+  --grad-blue: linear-gradient(135deg, #82b1ed 0%, #709fdc 100%);
+  --grad-teal: linear-gradient(135deg, #68d8bc 0%, #57c1a6 100%);
+
+  --sidebar-width: 270px;
+  --header-height: 80px;
+  --radius-lg: 20px;
+  --radius-sm: 12px;
+  --shadow-soft: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
 }
 
-/* === RESET === */
-* { box-sizing: border-box; }
+/* === RESET & BASE === */
+* {
+  box-sizing: border-box;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 body {
   margin: 0;
-  font-family: "Segoe UI", "Roboto", Helvetica, Arial, sans-serif;
-  background-color: var(--bg-body);
-  color: var(--text-main);
-  overflow-x: hidden;
-}
-
-/* === LAYOUT STRUCTURE === */
-.app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  font-family: "Inter", system-ui, sans-serif;
+  background:
+    radial-gradient(circle at top right, rgba(10, 138, 58, 0.03), transparent),
+    var(--bg-body);
+  color: #1e293b;
 }
 
 /* === TOPBAR === */
 .topbar {
   height: var(--header-height);
-  background: var(--bg-body);
+  background: rgba(248, 250, 252, 0.8);
+  backdrop-filter: blur(12px); /* Glass effect */
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 30px;
-  
-  /* Fixed Positioning relative to Sidebar */
+  padding: 0 40px;
   position: fixed;
   top: 0;
   right: 0;
-  /* Width is 100% minus sidebar */
-  width: calc(100% - var(--sidebar-width)); 
+  width: calc(100% - var(--sidebar-width));
   z-index: 20;
-  transition: width 0.3s ease;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
 }
 
-/* === TOGGLE LOGIC: TOPBAR === */
-/* When sidebar is collapsed, topbar becomes full width */
-body:has(.sidebar.collapsed) .topbar {
-  width: 100%;
+/* User Profile in Topbar */
+.user {
+  background: white;
+  padding: 6px 16px;
+  border-radius: 50px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid #f1f5f9;
 }
 
-.top-left {
-  display: flex;
-  align-items: center;
-  gap: 15px;
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid var(--primary-light);
 }
-
-.icon-btn {
-  background: none;
-  border: none;
-  font-size: 1.4rem;
-  cursor: pointer;
-  padding: 5px;
-  border-radius: 4px;
-  color: #555;
-}
-.icon-btn:hover { background: rgba(0,0,0,0.05); }
-
-/* User Profile */
-.user { display: flex; align-items: center; gap: 10px; }
-.avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; }
-.user-info .name { font-weight: 700; font-size: 0.9rem; color: #333; }
-.user-info .meta { font-size: 0.75rem; color: #666; }
 
 /* === MAIN CONTENT === */
 .content {
   margin-top: var(--header-height);
-  /* Push content to the right by default */
   margin-left: var(--sidebar-width);
-  padding: 30px;
+  padding: 40px;
   min-height: calc(100vh - var(--header-height));
-  transition: margin-left 0.3s ease;
 }
 
-/* === TOGGLE LOGIC: CONTENT === */
-/* When sidebar is collapsed, content margin becomes 0 */
-body:has(.sidebar.collapsed) .content {
-  margin-left: 0;
-}
-
-/* === DASHBOARD CARDS (From Screenshot) === */
+/* === DASHBOARD CARDS === */
 .cards-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 24px;
-  margin-bottom: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  margin-bottom: 40px;
 }
 
 .card {
-  padding: 24px;
-  border-radius: var(--radius);
-  color: white;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 140px;
-}
-
-/* Card Specific Colors */
-.card:nth-child(1) { background-color: var(--card-purple); }
-.card:nth-child(2) { background-color: var(--card-blue); }
-.card:nth-child(3) { background-color: var(--card-teal); }
-.card:nth-child(n+4) { background-color: #fff; color: #333; }
-
-.card-title { font-size: 0.9rem; opacity: 0.9; margin-bottom: 8px; }
-.card-value { font-size: 1.5rem; font-weight: 700; }
-
-/* === BRAND HEADER (Fixed Top Left) === */
-.brand {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: var(--sidebar-width);
-  height: var(--header-height);
-  background: var(--bg-sidebar);
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  gap: 12px;
-  border-right: 1px solid var(--border);
-  z-index: 30;
-  transition: transform 0.3s ease;
-}
-
-/* === TOGGLE LOGIC: BRAND === */
-/* Hide Brand when sidebar collapses */
-body:has(.sidebar.collapsed) .brand {
-  transform: translateX(-100%);
-}
-
-.brand-logo { width: 30px; height: 30px; }
-.brand-text strong { color: var(--primary); display: block; font-size: 0.9rem; }
-.brand-text small { color: #888; font-size: 0.75rem; }
-
-/* === UTILS === */
-.panel {
-  background: white;
-  padding: 20px;
-  border-radius: var(--radius);
-  margin-bottom: 20px;
-  border: 1px solid var(--border);
-}
-.btn {
-  padding: 8px 16px;
-  border-radius: 6px;
+  padding: 30px;
+  border-radius: var(--radius-lg);
+  color: black;
   border: none;
-  cursor: pointer;
-  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Floating effect for cards */
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* Card Gradient Backgrounds */
+.card:nth-child(1) {
+  background: var(--grad-purple);
+}
+.card:nth-child(2) {
+  background: var(--grad-blue);
+}
+.card:nth-child(3) {
+  background: var(--grad-teal);
+}
+
+.card-title {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.card-value {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-top: 10px;
+}
+
+/* === PANELS (The Inner Containers) === */
+.panel {
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: var(--shadow-soft);
+}
+
+/* Buttons */
+.btn {
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
   background: var(--primary);
   color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 12px var(--primary-glow);
 }
 
-/* === MOBILE === */
-@media (max-width: 768px) {
-  .topbar { width: 100%; }
-  .content { margin-left: 0; }
-  .brand { display: none; } /* Hide brand on mobile, sidebar covers it */
+.btn:hover {
+  background: var(--unn-green-hover);
+  transform: scale(1.02);
+}
+/* Target the hamburger specifically */
+#hamburger {
+  font-size: 1.8rem; /* Increased from 1.4rem for better visibility */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  border-radius: 12px; /* Matches your new input/button radius */
+  background: var(--primary-light); /* Soft green background */
+  color: var(--primary); /* Deep green icon color */
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  /* Positioning adjustment */
+  margin-top: 5px;
+}
+
+#hamburger:hover {
+  background: var(--primary);
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+/* Adjust the Top-Left container to center the icon better */
+.top-left {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* More breathing room between hamburger and search/title */
+  height: 100%;
+}
+/* The Track (Background) */
+.cgpa-visualizer-container {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.05); /* Subtle but defined depth */
+  border-radius: 20px;
+  height: 14px; /* Thicker for better visibility */
+  margin-top: 15px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  position: relative;
+}
+
+/* The Progress Bar (The glowing part) */
+#profileCgpaBar,
+#dashboardCgpaBar {
+  height: 100%;
+  width: 0%; /* Dynamic */
+  border-radius: 20px;
+  transition: width 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy animation */
+
+  /* High-contrast gradient with a "glow" */
+  background: linear-gradient(90deg, #0fb930, #0a8a3a);
+  box-shadow: 0 0 15px rgba(10, 138, 58, 0.3);
+  position: relative;
+}
+
+/* Optional: Add a subtle shine effect to the bar */
+#profileCgpaBar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
+}
+
+/* Responsive fixes */
+body:has(.sidebar.collapsed) .topbar {
+  width: 100%;
+}
+body:has(.sidebar.collapsed) .content {
+  margin-left: 0;
 }

@@ -1,6 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const API_BASE = "http://localhost:4000";
-
   async function renderResults() {
     const tableBody = document.getElementById("resultsTableBody");
     if (!tableBody || tableBody.dataset.loaded === "true") return;
@@ -48,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
               ${r.grade === "F" ? "Fail" : "Pass"}
             </td>
           </tr>
-        `
+        `,
           )
           .join("");
       }

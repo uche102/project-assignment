@@ -236,21 +236,42 @@
     menuEl
       .querySelectorAll("[data-page]")
       .forEach((b) => b.classList.remove("active"));
+
     const activeBtn = menuEl.querySelector(`[data-page="${pageName}"]`);
     if (activeBtn) activeBtn.classList.add("active");
+
     const target = pagesContainer.querySelector(
-      `.partial-content[data-page="${pageName}"]`
+      `.partial-content[data-page="${pageName}"]`,
     );
+
     if (target) {
       target.style.display = "";
       const title =
         target.getAttribute("data-title") || activeBtn?.textContent || pageName;
       pageTitle.textContent = title.trim();
+
+      // === NEW: DATA POPULATION TRIGGERS ===
+
+      // 1. Refresh Profile & Stats when clicking 'profile' or 'dashboard'
+      if (
+        (pageName === "profile" || pageName === "dashboard") &&
+        typeof loadAllStats === "function"
+      ) {
+        loadAllStats();
+      }
+
+      // 2. Load the Lecturer Directory when clicking 'lecturers'
+      if (pageName === "lecturers" && typeof loadLecturers === "function") {
+        loadLecturers();
+      }
+
+      // Existing assignments check
       if (
         pageName === "assignments" &&
         typeof window.renderTasks === "function"
-      )
+      ) {
         window.renderTasks();
+      }
     }
   }
 
