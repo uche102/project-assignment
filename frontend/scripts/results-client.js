@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     token = token.replace(/['"]+/g, "").trim();
 
-    // 2. Decode User to get username
+    // 2. Decode User
     let user = {};
     try {
       user = JSON.parse(atob(token.split(".")[1]));
@@ -19,11 +19,17 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // === FIX: USE REG_NO INSTEAD OF USERNAME ===
+    const studentID = user.reg_no || user.username;
+
     try {
-      // 3. FETCH FROM DATABASE (The Official Source)
-      const res = await fetch(`${API_BASE}/api/results/${user.username}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      // 3. FETCH FROM DATABASE
+      const res = await fetch(
+        `${API_BASE}/api/results/${encodeURIComponent(studentID)}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
 
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
@@ -31,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (myResults.length === 0) {
         tableBody.innerHTML =
-          '<tr><td colspan="4" style="text-align:center;">No results found in Database.</td></tr>';
+          '<tr><td colspan="4" style="text-align:center;">No results found.</td></tr>';
       } else {
         tableBody.innerHTML = myResults
           .map(
@@ -41,9 +47,9 @@ document.addEventListener("DOMContentLoaded", () => {
             <td style="padding: 10px;">${r.unit || "-"}</td>
             <td style="padding: 10px; font-weight: bold;">${r.grade}</td>
             <td style="padding: 10px; color: ${
-              r.grade === "F" ? "red" : "green"
+              (r.grade || "F").toUpperCase() === "F" ? "red" : "green"
             }; font-weight:bold;">
-              ${r.grade === "F" ? "Fail" : "Pass"}
+              ${(r.grade || "F").toUpperCase() === "F" ? "Fail" : "Pass"}
             </td>
           </tr>
         `,
@@ -53,17 +59,11 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       console.error("Result Fetch Error:", err);
       tableBody.innerHTML =
-        '<tr><td colspan="4">Error loading results from server.</td></tr>';
+        '<tr><td colspan="4">Error loading results.</td></tr>';
     }
 
     tableBody.dataset.loaded = "true";
   }
 
   renderResults();
-
-  // Watch for page navigation
-  const observer = new MutationObserver(() => {
-    if (document.getElementById("resultsTableBody")) renderResults();
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
 });

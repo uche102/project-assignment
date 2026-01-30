@@ -1,5 +1,5 @@
 /* =========================================
-   Paystack Client Script for Student Portal
+   Paystack Client Script (Merged: RegNo Fix + Hybrid Sync)
    ========================================= */
 
 let PAYSTACK_PUBLIC_KEY = null;
@@ -25,14 +25,18 @@ function initPaystack() {
   if (!payBtn || payBtn.dataset.bound === "true") return;
   payBtn.dataset.bound = "true";
 
-  // Get User Info
+  // === FIX 1: EXTRACT REG NUMBER ===
   let token = localStorage.getItem("token");
   let user = {};
   try {
-    // Handle token cleanup just in case
-    if (token) token = token.replace(/['"]+/g, "").trim();
-    user = JSON.parse(atob(token.split(".")[1]));
+    if (token) {
+      token = token.replace(/['"]+/g, "").trim();
+      user = JSON.parse(atob(token.split(".")[1]));
+    }
   } catch (e) {}
+
+  // Prioritize Reg No, fallback to username
+  const studentID = user.reg_no || user.username || "student";
 
   payBtn.addEventListener("click", async (e) => {
     e.preventDefault();
@@ -61,9 +65,9 @@ function initPaystack() {
       metadata: {
         custom_fields: [
           {
-            display_name: "Student",
+            display_name: "Student ID",
             variable_name: "student",
-            value: user.username,
+            value: studentID, // FIX: Send Reg No to Paystack metadata
           },
         ],
       },
@@ -74,14 +78,14 @@ function initPaystack() {
         payBtn.textContent = "Verifying...";
         payBtn.disabled = true;
 
-        // A. HYBRID SYNC: Local fallback
+        // A. HYBRID SYNC: Local fallback (Kept your logic!)
         const currentTotal = parseInt(localStorage.getItem("fees_paid") || "0");
         localStorage.setItem("fees_paid", currentTotal + amountNaira);
 
-        // B. THE SIGNAL: Use 'window' so dashboard-client.js hears it
+        // B. THE SIGNAL: Tell Dashboard to refresh immediately
         window.dispatchEvent(new Event("statsUpdated"));
 
-        // C. BACKEND SYNC: Include username for the database link
+        // C. BACKEND SYNC: FIX - Send 'studentID' (RegNo) instead of 'username'
         fetch(`${API_BASE}/api/payments/save`, {
           method: "POST",
           headers: {
@@ -91,7 +95,7 @@ function initPaystack() {
           body: JSON.stringify({
             reference: response.reference,
             amount: amountNaira,
-            username: user.username, // Ensure backend knows WHO paid
+            username: studentID, // <--- CRITICAL DATABASE LINK
           }),
         })
           .then((res) => res.json())
@@ -99,7 +103,7 @@ function initPaystack() {
             alert("Payment Successful! Record saved to database.");
             payBtn.textContent = "Pay Again";
             payBtn.disabled = false;
-            payBtn.style.background = "#16a34a"; //  Green
+            payBtn.style.background = "#16a34a"; // Green
 
             // Final refresh to ensure DB data matches LocalStorage
             window.dispatchEvent(new Event("statsUpdated"));
@@ -125,5 +129,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   initPaystack();
 });
 
-// Partial Loader Support
+// Partial Loader Support (for Single Page App navigation)
 document.addEventListener("partials:loaded", initPaystack);
