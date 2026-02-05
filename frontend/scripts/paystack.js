@@ -1,13 +1,11 @@
-/* =========================================
-   Paystack Client Script (Fixed: Scoped Variables)
-   ========================================= */
+
 
 (function () {
-  // 1. Define Config LOCALLY (Prevents "Redeclaration" errors)
+  //  Define Config LOCALLY (Prevents "Redeclaration" errors)
   const API_BASE = "http://localhost:4000";
   let PAYSTACK_PUBLIC_KEY = null;
 
-  // 2. Load Key from Backend
+  //  Load Key from Backend
   async function loadPaystackKey() {
     try {
       const res = await fetch(`${API_BASE}/api/config/paystack`);
@@ -19,7 +17,7 @@
     }
   }
 
-  // 3. Initialize Button Logic
+  // Initialize Button Logic
   function initPaystack() {
     const payBtn = document.getElementById("payFeesBtn");
 
@@ -61,7 +59,7 @@
       const amountInput = document.getElementById("feeAmount");
       const amountNaira = amountInput ? parseInt(amountInput.value) : 9000;
 
-      // 4. Open Paystack Popup
+      //  Opens Paystack Popup
       const handler = PaystackPop.setup({
         key: PAYSTACK_PUBLIC_KEY,
         email: `${user.username || "student"}@unn.edu.ng`,
@@ -78,7 +76,7 @@
           ],
         },
         // ============================================================
-        // 5. ON SUCCESS: "Verify" and Save
+        //  ON SUCCESS: "Verify" and Save
         // ============================================================
         callback: function (response) {
           // This "Verifying..."
@@ -104,7 +102,7 @@
             body: JSON.stringify({
               reference: response.reference,
               amount: amountNaira,
-              username: studentID, // Saving RegNo to Database
+              username: studentID, // Saves RegNo to Database
             }),
           })
             .then((res) => res.json())
@@ -119,7 +117,7 @@
             })
             .catch((err) => {
               console.error("Backend Sync Error:", err);
-              // Even if DB fails,  it worked locally
+              // Even if DB fails,   worked locally
               alert("Payment successful (Local). Backend sync pending.");
               payBtn.disabled = false;
             });
@@ -133,7 +131,7 @@
     });
   }
 
-  // 6. Run Init Logic
+  //  Run Init Logic
   //  checks if document is ready, or wait for it
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", async () => {
@@ -141,7 +139,7 @@
       initPaystack();
     });
   } else {
-    // If already loaded (dynamic navigation), run immediately
+    // If already loaded (dynamic navigation), runs immediately
     loadPaystackKey().then(initPaystack);
   }
 })();

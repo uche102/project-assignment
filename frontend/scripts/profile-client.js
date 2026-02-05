@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Define Global Function
+  // Global Function
   window.loadProfile = function () {
     console.log("Loading Profile Data...");
 
-    // 1. Find the HTML Elements we just created
+    //  Find the HTML Elements  created
     const nameHeader = document.getElementById("prof-name");
     const regHeader = document.getElementById("prof-reg");
 
@@ -11,10 +11,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const fieldReg = document.getElementById("field-reg");
     const fieldEmail = document.getElementById("field-email");
 
-    // If elements are missing (e.g. we are on a different tab), stop.
+    // If elements are missing  stop.
     if (!nameHeader) return;
 
-    // 2. Get User Data from Token
+    //  Get User Data from Token
     let token = localStorage.getItem("token");
     if (!token) return;
 
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const username = (user.username || "Student").toUpperCase();
       const regNo = user.reg_no || "N/A";
 
-      // 3. Fill in the HTML
+      //  Fill in the HTML
       nameHeader.textContent = username;
       regHeader.textContent = `Reg No: ${regNo}`;
 
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // Run immediately if the elements exist
+  // Runs if prof-name elements exist
   if (document.getElementById("prof-name")) {
     window.loadProfile();
   }

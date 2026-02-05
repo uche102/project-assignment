@@ -2,12 +2,12 @@ async function loadLecturers() {
   const listContainer = document.getElementById("lecturerList");
   if (!listContainer) return;
 
-  //global API_BASE
+  // API_BASE
   const API_BASE = window.API_BASE || "http://localhost:4000";
   const token = localStorage.getItem("token")?.replace(/['"]+/g, "").trim();
 
   try {
-    // 1. Decode User
+    //  Decode User
     let user = {};
     if (token) {
       try {
@@ -16,7 +16,7 @@ async function loadLecturers() {
     }
     const username = user.username || "student";
 
-    // 2. Fetch My Courses To identify "My Lecturers"
+    //  Fetch  Courses To identify "My Lecturers"
     let myCodes = [];
     try {
       const coursesRes = await fetch(
@@ -36,7 +36,7 @@ async function loadLecturers() {
       console.warn("Could not fetch my courses", e);
     }
 
-    // 3. Fetch Lecturers
+    //  Fetch Lecturers
     const res = await fetch(`${API_BASE}/api/lecturers`, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -48,7 +48,7 @@ async function loadLecturers() {
    
     // If server sent an array: use it.
     // If server sent an object with .rows: use .rows.
-    // Otherwise: default to empty array [].
+    // else default to empty array [].
     let lecturers = [];
     if (Array.isArray(responseData)) {
       lecturers = responseData;
@@ -60,14 +60,14 @@ async function loadLecturers() {
       return;
     }
 
-    // 4. Handle Empty List
+    //  Handle Empty List
     if (lecturers.length === 0) {
       listContainer.innerHTML =
         "<p>No lecturers found in the directory.</p>";
       return;
     }
 
-    // 5. Render List
+    // Render List
     listContainer.innerHTML = lecturers
       .map((lec) => {
         // Handle if courses is missing or null
@@ -80,7 +80,7 @@ async function loadLecturers() {
           ? `<span>Your Lecturer</span>`
           : "";
 
-        // Build Course Badges
+        // Builds Course Badges
         const courseBadges =
           coursesArray.length > 0
             ? coursesArray

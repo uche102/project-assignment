@@ -1,4 +1,4 @@
-/* results-client.js - Fixed: Descriptive Remarks & Colors */
+
 
 window.renderResults = async function () {
   console.log("Rendering Results...");
@@ -10,7 +10,7 @@ window.renderResults = async function () {
 
   if (!tableBody) return;
 
-  // 1. Get Token
+  //  Get Token
   let token = localStorage.getItem("token");
   if (!token) {
     tableBody.innerHTML = '<tr><td colspan="4">Please log in.</td></tr>';
@@ -18,7 +18,7 @@ window.renderResults = async function () {
   }
   token = token.replace(/['"]+/g, "").trim();
 
-  // 2. Decode User
+  //  Decode User
   let studentID = "";
   try {
     const user = JSON.parse(atob(token.split(".")[1]));
@@ -29,7 +29,7 @@ window.renderResults = async function () {
   }
 
   try {
-    // 3. FETCH DATA
+    //  FETCH DATA
     const res = await fetch(
       `${API_BASE}/api/results/${encodeURIComponent(studentID)}`,
       { headers: { Authorization: `Bearer ${token}` } },
@@ -43,50 +43,50 @@ window.renderResults = async function () {
       tableBody.innerHTML =
         '<tr><td colspan="4" style="text-align:center; padding: 20px;">No results found.</td></tr>';
     } else {
-      // 4. SORT LOGIC (A -> F)
+      //  SORT LOGIC (A -> F)
       myResults.sort((a, b) => {
         const gradeA = (a.grade || "F").trim().toUpperCase();
         const gradeB = (b.grade || "F").trim().toUpperCase();
         return gradeA.localeCompare(gradeB);
       });
 
-      // 5. RENDER WITH REMARKS
+      // RENDER WITH REMARKS
       tableBody.innerHTML = myResults
         .map((r) => {
           const grade = (r.grade || "F").trim().toUpperCase();
 
-          // --- REMARK & COLOR LOGIC ---
+          //  REMARK AND COLOR LOGIC ---
           let remark = "Unknown";
-          let color = "#333"; // Default black
+          let color = "#333"; 
 
           switch (grade) {
             case "A":
               remark = "Excellent";
-              color = "#16a34a"; // Green
+              color = "green"; 
               break;
             case "B":
               remark = "Very Good";
-              color = "#0ea5e9"; // Blue
+              color = "blue"; 
               break;
             case "C":
               remark = "Good";
-              color = "#4f46e5"; // Indigo
+              color = "#4f46e5"; 
               break;
             case "D":
               remark = "Fair";
-              color = "#ca8a04"; // Dark Yellow
+              color = "#ca8a04"; 
               break;
             case "E":
               remark = "Pass";
-              color = "#ea580c"; // Orange
+              color = "orange"; 
               break;
             case "F":
               remark = "Fail";
-              color = "#dc2626"; // Red
+              color = "red"; 
               break;
             default:
               remark = "Pending";
-              color = "#9ca3af"; // Grey
+              color = "gray"; 
           }
           // ----------------------------
 
@@ -110,7 +110,7 @@ window.renderResults = async function () {
   }
 };
 
-// Run immediately if table exists
+// Runs immediately if table exists
 if (document.getElementById("resultsTableBody")) {
   window.renderResults();
 }

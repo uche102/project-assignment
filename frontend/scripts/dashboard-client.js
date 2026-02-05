@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const API_BASE = "http://localhost:4000";
 
   // ===============================
-  // 1. HELPER: UPDATE UI ELEMENTS
+  //   UPDATED UI ELEMENTS
   // ===============================
   function updateDashboardUI(
     username,
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     courseCount,
     fees,
   ) {
-    // --- A. UPDATE SIDEBAR (Restored!) ---
+    // ---  UPDATE SIDEBAR  ---
     const sideName = document.getElementById("profileNameDisplay");
     const sideReg = document.getElementById("profileRegDisplay");
     const sideCgpaText = document.getElementById("profileCgpaText");
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
       else sideCgpaBar.style.background = "#dc3545"; // Red
     }
 
-    // --- B. UPDATE DASHBOARD MAIN AREA ---
+    // ---  UPDATED DASHBOARD MAIN AREA ---
     const nameDisplay = document.getElementById("displayUsername");
     const regDisplay = document.getElementById("displayRegNo");
     const topbarName = document.getElementById("topbarUsername");
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (feesEl) feesEl.textContent = `₦${fees.toLocaleString()}`;
     if (cgpaCard) cgpaCard.textContent = cgpa;
 
-    // --- C. UPDATE DASHBOARD CGPA CARD (Visual Bar) ---
+    // ---  UPDATE DASHBOARD CGPA CARD (Visual Bar) ---
     const dashBar = document.getElementById("cgpaProgressBar");
     const dashRemark = document.getElementById("cgpaRemark");
 
@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===============================
-  // 2. MAIN DATA LOADER
+  //  MAIN DATA LOADER
   // ===============================
   async function loadAllStats() {
     let token = localStorage.getItem("token");

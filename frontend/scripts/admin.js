@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!courseSelect || !lecturerSelect) return;
 
-    // A. FETCH COURSES
+    //  FETCH COURSES
     try {
       courseSelect.innerHTML = "<option>Loading Courses...</option>";
 
@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
       courseSelect.innerHTML = "<option>Error loading courses</option>";
     }
 
-    // B. FETCH LECTURERS
+    //  FETCH LECTURERS
     try {
       lecturerSelect.innerHTML = "<option>Loading Lecturers...</option>";
 
@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // --- 5. CREATE COURSE LOGIC (Moved Outside!) ---
+  //  CREATE COURSE LOGIC  
   window.createCourse = async function () {
     const code = document.getElementById("newCourseCode").value;
     const title = document.getElementById("newCourseTitle").value;

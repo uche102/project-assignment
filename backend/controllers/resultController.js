@@ -1,7 +1,7 @@
-const pool = require("../db");
+import { query as _query } from "../db";
 
-// Upload a new result
-exports.uploadResult = async (req, res) => {
+// Upload new result
+export async function uploadResult(req, res) {
   try {
     const { student_id, course_code, grade, unit } = req.body;
 
@@ -19,7 +19,7 @@ exports.uploadResult = async (req, res) => {
 
     const values = [student_id, course_code, grade, unit, filePath];
 
-    const result = await pool.query(query, values);
+    const result = await _query(query, values);
 
     res.status(201).json({
       message: "Result uploaded successfully",
@@ -29,8 +29,8 @@ exports.uploadResult = async (req, res) => {
     console.error("Upload Result Error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
-};
-exports.getStudentResults = async (req, res) => {
+}
+export async function getStudentResults(req, res) {
   try {
     const { student_id } = req.params;
 
@@ -47,11 +47,11 @@ exports.getStudentResults = async (req, res) => {
       ORDER BY id DESC
     `;
 
-    const result = await pool.query(query, [student_id]);
+    const result = await _query(query, [student_id]);
 
     res.json(result.rows);
   } catch (err) {
     console.error("Get Student Results Error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
-};
+}

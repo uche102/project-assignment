@@ -1,6 +1,6 @@
 (function () {
   // =======================================
-  // 1. CONFIGURATION
+  //  CONFIGURATION
   // =======================================
   const SCRIPT_PATH = "scripts/";
 
@@ -13,7 +13,7 @@
   };
 
   // =======================================
-  // 2. AUTH CHECK & SIDEBAR INIT
+  //  AUTH CHECK & SIDEBAR INIT
   // =======================================
   const token = localStorage.getItem("token");
   const path = window.location.pathname;
@@ -41,14 +41,14 @@
       const username = (user.username || "Student").toUpperCase();
       const regNo = user.reg_no || "N/A";
 
-      // 1. Update Sidebar Profile
+      // Updates Sidebar Profile
       const sideName = document.getElementById("sideName");
       const sideReg = document.getElementById("sideReg");
 
       if (sideName) sideName.textContent = username;
       if (sideReg) sideReg.textContent = `Reg No: ${regNo}`;
 
-      // 2. Update Topbar (Top right corner)
+      //  Updates Topbar
       const topName = document.getElementById("topbarUsername");
       if (topName) topName.textContent = username;
     } catch (e) {
@@ -57,7 +57,7 @@
   }
 
   // =======================================
-  // 3. DYNAMIC SCRIPT LOADER
+  //  DYNAMIC SCRIPT LOADER
   // =======================================
   function loadPageScript(pageName) {
     const fileName = pageScripts[pageName];
@@ -85,7 +85,7 @@
   }
 
   // =======================================
-  // 4. NAV & PARTIAL LOADER
+  //  NAV & PARTIAL LOADER
   // =======================================
   const partials = [
     "dashboard",
@@ -126,7 +126,7 @@
   }
 
   async function init() {
-    updateSidebar(); // Run immediately
+    updateSidebar(); // Runs immediately
 
     for (const name of partials) {
       const p = await loadPartial(name);

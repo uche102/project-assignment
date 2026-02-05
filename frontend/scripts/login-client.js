@@ -106,13 +106,13 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       if (signupEl) return;
 
-      // 1. Hide the main login elements to make space
+      //  Hides login elements to make space
       const loginElements = form.querySelectorAll(
         "h1, .sub, #username, #password, #toggle, #signInBtn, .forgot-link, .small, .admin-btn",
       );
       loginElements.forEach((el) => (el.style.display = "none"));
 
-      // 2. Create the Signup Container
+      // Create the Signup Container
       signupEl = document.createElement("div");
       signupEl.className = "signup-container";
       signupEl.innerHTML = `

@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Borrow Client: Active");
 
-  // ============================
-  // 1. MOCK DATA
-  // ============================
+  
+  //  MOCK DATA
+  
   const borrowableCourses = [
     {
       code: "PSY101",
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const STORAGE_KEY = "borrowed_courses";
 
   // ============================
-  // 2. HELPER FUNCTIONS
+  //  HELPER FUNCTIONS
   // ============================
   function getBorrowed() {
     const json = localStorage.getItem(STORAGE_KEY);
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================
-  // 3. RENDER LOGIC
+  //  RENDER LOGIC
   // ============================
   function render(filterText = "") {
     const listEl = document.getElementById("borrow-list");
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Build HTML
+    //  HTML
     listEl.innerHTML = filtered
       .map((course) => {
         const isBorrowed = myBorrowed.includes(course.code);
@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .join("");
 
-    // Add Click Listeners
+    // Adds  Listeners
     listEl.querySelectorAll(".btn-borrow").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -121,22 +121,22 @@ document.addEventListener("DOMContentLoaded", () => {
       current.push(code); // Add
     }
 
-    // Save to storage
+    // Saves to storage
     saveBorrowed(current);
 
     // ==========================================
-    // 4. THE FIX: TRIGGER DASHBOARD UPDATE
+    //  TRIGGER DASHBOARD UPDATE
     // ==========================================
     // sends message to dashboard-client.js immediately
    window.dispatchEvent(new Event("statsUpdated"));
 
-    // Re-render the list to show green/red button change
+    // shows green/red button change
     const searchInput = document.getElementById("borrowSearch");
     render(searchInput ? searchInput.value : "");
   }
 
   // ============================
-  // 5. INITIALIZATION
+  //  INITIALIZATION
   // ============================
   function init() {
     const listEl = document.getElementById("borrow-list");
@@ -145,12 +145,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!listEl) return;
     if (listEl.dataset.ready === "true") return;
 
-    // Mark as ready
+    // Marks as ready
     listEl.dataset.ready = "true";
 
     const searchInput = document.getElementById("borrowSearch");
     if (searchInput) {
-      // Use 'input' for real-time filtering
+      // Uses input for real-time filtering
       searchInput.addEventListener("input", (e) => render(e.target.value));
     }
 

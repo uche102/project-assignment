@@ -1,10 +1,5 @@
-// backend/controllers/paystackController.js
-
 const pool = require("../db");
 
-/**
- * Verify a Paystack payment by reference
- */
 const verifyPayment = async (req, res) => {
   const { reference } = req.params;
 
@@ -16,7 +11,7 @@ const verifyPayment = async (req, res) => {
         headers: {
           Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
         },
-      }
+      },
     );
 
     const data = await response.json();
@@ -62,10 +57,7 @@ const verifyPayment = async (req, res) => {
   }
 };
 
-/**
- * Get all payments for the currently authenticated user
- * Requires JWT middleware to set req.user
- */
+//gets all payment for user
 const getMyPayments = async (req, res) => {
   try {
     const userId = req.user?.id;

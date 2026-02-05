@@ -7,7 +7,7 @@ const {
 } = require("../controllers/paystackController");
 
 
-// Verify Paystack payment
+// Verifies Paystack payment
 router.get("/verify/:reference", verifyPayment);
 
 

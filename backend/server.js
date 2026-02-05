@@ -84,7 +84,7 @@ app.get("/api/payments/total/:regNo", requireAuth, async (req, res) => {
   }
 });
 
-// 2. SAVE PAYMENT (CORRECT: Standalone Route)
+
 // ==========================================
 // REAL PAYMENT VERIFICATION ROUTE
 // ==========================================
@@ -99,8 +99,8 @@ app.post("/api/payments/save", requireAuth, async (req, res) => {
       return res.status(400).json({ error: "Missing payment details" });
     }
 
-    // 1. ASK PAYSTACK: "Is this reference valid?"
-    // We use the Secret Key here to be secure
+    //  
+    //  use  Secret Key here to be secure
     const paystackResponse = await fetch(
       `https://api.paystack.co/transaction/verify/${reference}`,
       {
@@ -114,16 +114,16 @@ app.post("/api/payments/save", requireAuth, async (req, res) => {
 
     const paystackData = await paystackResponse.json();
 
-    // 2. CHECK STATUS
+    // CHECK STATUS
     if (!paystackData.status || paystackData.data.status !== "success") {
       console.error("Paystack Verification Failed:", paystackData);
       return res.status(400).json({ error: "Payment verification failed" });
     }
 
-    // 3. GET REAL AMOUNT (Paystack returns amount in Kobo, e.g., 900000)
+    //  GET REAL AMOUNT
     const realAmount = paystackData.data.amount / 100;
 
-    // 4. SAVE TO DATABASE
+    //  SAVE TO DATABASE
     await pgClient.query(
       "INSERT INTO payments_pg (student, reference, amount, status) VALUES ($1, $2, $3, 'success')",
       [username, reference, realAmount],
@@ -215,7 +215,7 @@ app.post("/api/admin/assign-course", requireAuth, async (req, res) => {
     res.status(500).json({ error: "Database error" });
   }
 });
-/* FIXED: Add Course Route */
+
 app.post("/api/admin/add-course", requireAuth, async (req, res) => {
   const { code, title, unit, level } = req.body;
   try {
@@ -387,7 +387,7 @@ app.get("/", (req, res) =>
 (async function start() {
   try {
     await pgClient.connect();
-    // (Table creation queries omitted for brevity, assuming they exist)
+    
     console.log("Postgres Ready.");
     app.listen(PORT, () =>
       console.log(`Server running on http://localhost:${PORT}`),

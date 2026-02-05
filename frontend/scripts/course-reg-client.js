@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!list) return;
     if (list.dataset.loaded === "true") return;
 
-    // 1. Get Token & User
+    //  Get Token & User
     let token = localStorage.getItem("token");
     if (token) token = token.replace(/['"]+/g, "").trim();
 
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (e) {}
     }
 
-    // 2. Fetchs ALREADY REGISTERED courses from Database
+    // Fetchs ALREADY REGISTERED courses from Database
     let registeredCodes = [];
     if (token) {
       try {
@@ -45,10 +45,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // 3. Render the List
+    //  Render the List
     list.innerHTML = availableCourses
       .map((c) => {
-        // Check if user already has this course
+        // Checks if user already has this course
         const isRegistered = registeredCodes.includes(c.code);
 
         // Button Logic: Green/Red based on status
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .join("");
 
-    // 4. Add Event Listeners
+    //  Add Event Listeners
     list.querySelectorAll(".btn-reg").forEach((btn, index) => {
       btn.addEventListener("click", async () => {
         if (!token) {
@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
             //   Dashboard  refresh 
             window.dispatchEvent(new Event("statsUpdated"));
 
-            // 2. RE-RENDER: Update the local button colors (Register -> Remove)
+            //  RE-RENDER: Update the local button colors (Register -> Remove)
             // clear  flag so it fetches the fresh list from the DB
             list.dataset.loaded = "false";
             renderCourses();

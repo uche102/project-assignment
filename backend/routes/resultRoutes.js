@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const pgClient = require("../server").pgClient; // import pgClient
+const pgClient = require("../server").pgClient; // imports pgClient
 
-// GET /api/results — fetch results for logged-in user
+// GET /api/results
 router.get("/", async (req, res) => {
   try {
     const authHeader = req.headers.authorization;

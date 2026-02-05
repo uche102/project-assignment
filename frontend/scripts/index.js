@@ -1,6 +1,4 @@
-/* ======================================
-   Body.js - Global Utilities
-   ====================================== */
+
 
 //   window  bypasses module scoping
 window.generateCalendarPDF = function () {
