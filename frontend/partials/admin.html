@@ -2,125 +2,114 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Admin Panel – UNN Portal</title>
-    <link rel="stylesheet" href="../styles/admin.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Portal - UNN</title>
+
+    <link rel="stylesheet" href="/styles/admin.css" />
   </head>
   <body>
-    <header>ADMIN PANEL – UNN PORTAL</header>
+    <div class="admin-wrapper">
+      <header>
+        <h2>Admin Control Panel</h2>
+        <p id="adminLoginStatus">Restricted Access</p>
+      </header>
 
-    <div class="container">
-      <h2>Upload Student Results (CSV)</h2>
+      <div id="adminLogin" class="container login-panel">
+        <h3>Login Required</h3>
+        <p class="muted">Enter your admin credentials</p>
 
-      <div id="adminLogin" style="margin-bottom: 12px">
-        <label>Admin username <input id="adminUser" value="uche" /></label>
-        <label>Admin password <input id="adminPass" type="password" /></label>
-        <button id="adminLoginBtn">Login</button>
-        <span id="adminLoginStatus" class="muted"></span>
+        <label>Username</label>
+        <input type="text" id="adminUser" placeholder="e.g. uche" />
+
+        <label>Password</label>
+        <input type="password" id="adminPass" placeholder="•••••••" />
+
+        <button id="adminLoginBtn">Secure Login</button>
       </div>
 
-      <input type="file" id="resultFile" accept=".csv" />
-      <button id="uploadResultsBtn">Upload Results</button>
-      <div id="uploadStatus" style="display: none; margin-top: 8px"></div>
+      <div id="adminDashboard" class="hidden">
+        <div class="dashboard-grid">
+          <div class="container card border-green">
+            <h3>➕ Create New Course</h3>
+            <p class="muted">Add a course to the database.</p>
 
-      <div id="availablecourse" style="margin-top: 18px">
-        <input
-          type="text"
-          id="courseInput"
-          placeholder="Course code (e.g. CSC101)"
-        />
-        <label for="course">Enter Course Code</label>
-        <button id="fetchStudentsBtn">Fetch Enrolled Students</button>
-      </div>
-    </div>
-    <div
-      class="panel"
-      style="margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px"
-    >
-      <h3>Upload Lecturers (CSV)</h3>
-      <p class="muted">CSV Headers: Name, Email, Office, Courses</p>
+            <input
+              type="text"
+              id="newCourseCode"
+              placeholder="Code (e.g. CSC201)"
+            />
+            <input
+              type="text"
+              id="newCourseTitle"
+              placeholder="Title (e.g. Java Programming)"
+            />
 
-      <input type="file" id="lecturerFile" accept=".csv" />
-      <button
-        id="uploadLecturersBtn"
-        style="
-          background: #28a745;
-          color: white;
-          border: none;
-          padding: 5px 15px;
-          border-radius: 4px;
-          cursor: pointer;
-        "
-      >
-        Upload Lecturers
-      </button>
-    </div>
-    <div
-      class="panel"
-      style="margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px"
-    >
-      <h3>🎓 Assign Courses to Lecturers</h3>
-      <p class="muted">Link a course code to a specific lecturer.</p>
+            <div class="row">
+              <input type="number" id="newCourseUnit" placeholder="Units (3)" />
+              <input
+                type="number"
+                id="newCourseLevel"
+                placeholder="Level (200)"
+              />
+            </div>
 
-      <div
-        style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap"
-      >
-        <div style="flex: 1; min-width: 200px">
-          <label style="display: block; margin-bottom: 5px; font-weight: bold"
-            >Select Course</label
-          >
-          <select
-            id="assignCourseSelect"
-            style="
-              width: 100%;
-              padding: 10px;
-              border: 1px solid #ccc;
-              border-radius: 4px;
-            "
-          >
-            <option value="">Loading courses...</option>
-          </select>
+            <button onclick="createCourse()" class="btn-dark">
+              Add Course
+            </button>
+          </div>
+
+          <div id="availablecourse" class="container card border-blue">
+            <h3>🔗 Assign Lecturer</h3>
+            <p class="muted">Link a course to a lecturer.</p>
+
+            <label>Select Course</label>
+            <select id="assignCourseSelect">
+              <option value="">Loading...</option>
+            </select>
+
+            <label>Select Lecturer</label>
+            <select id="assignLecturerSelect">
+              <option value="">Loading...</option>
+            </select>
+
+            <button onclick="assignCourse()">Link Now</button>
+            <p id="assignStatus"></p>
+          </div>
         </div>
 
-        <div style="flex: 1; min-width: 200px">
-          <label style="display: block; margin-bottom: 5px; font-weight: bold"
-            >Select Lecturer</label
-          >
-          <select
-            id="assignLecturerSelect"
-            style="
-              width: 100%;
-              padding: 10px;
-              border: 1px solid #ccc;
-              border-radius: 4px;
-            "
-          >
-            <option value="">Loading lecturers...</option>
-          </select>
+        <div class="container card">
+          <h3>📂 Bulk Data Uploads</h3>
+
+          <div class="dashboard-grid">
+            <div>
+              <h4>1. Upload Results (CSV)</h4>
+              <p class="muted small">
+                Headers: student, course_code, grade, unit
+              </p>
+              <input type="file" id="resultFile" accept=".csv" />
+              <button id="uploadResultsBtn" class="btn-grey">
+                Upload Results
+              </button>
+              <span id="uploadStatus"></span>
+            </div>
+
+            <div>
+              <h4>2. Upload Lecturers (CSV)</h4>
+              <p class="muted small">Headers: name, email, office, courses</p>
+              <input type="file" id="lecturerFile" accept=".csv" />
+              <button id="uploadLecturersBtn" class="btn-grey">
+                Upload Lecturers
+              </button>
+            </div>
+          </div>
         </div>
-
-        <button
-          onclick="assignCourse()"
-          style="
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            height: 42px;
-          "
-        >
-          Assign Now
-        </button>
       </div>
-
-      <p id="assignStatus" style="margin-top: 10px; font-size: 0.9rem"></p>
     </div>
 
     <footer>
-      &copy; 2024 UNN Portal. Developed by Uche.
+      <p>&copy; 2026 UNN Portal Admin</p>
     </footer>
-    <script src="../scripts/admin.js"></script>
-    <script src="../scripts/body.js"></script>
+
+    <script src="/scripts/admin.js"></script>
   </body>
 </html>

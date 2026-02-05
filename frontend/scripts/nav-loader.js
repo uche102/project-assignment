@@ -1,34 +1,92 @@
-// nav-loader.js — dynamically load nav button partials and page partials
 (function () {
   // =======================================
-  // 1. SESSION / AUTH CHECK
+  // 1. CONFIGURATION
+  // =======================================
+  // Path to scripts relative to index.html
+  const SCRIPT_PATH = "scripts/";
+
+  // Mapping pages to their specific script files
+  const pageScripts = {
+    dashboard: "dashboard-client.js",
+    profile: "profile-client.js",
+    results: "results-client.js",
+    "academic-fees": "paystack.js",
+  };
+
+  // =======================================
+  // 2. AUTH CHECK & SIDEBAR INIT
   // =======================================
   const token = localStorage.getItem("token");
   const path = window.location.pathname;
 
-  // SAFETY CHECK: If already on a public page, do nothing.
-  // We check for "login.html" which matches "/partials/login.html" too.
   if (
     path.includes("login.html") ||
     path.includes("register.html") ||
     path.includes("admin.html")
   ) {
-    // We are on the login page. Stop here.
-    // Do NOT return here if you want the init() function below to run (e.g. if login page needs partials)
-
     return;
   }
 
-  // IF NO TOKEN -> REDIRECT TO LOGIN (Inside Partials)
   if (!token) {
-    console.warn("No token found. Redirecting to login...");
-    // FIX: Point to the file inside the partials folder
-    window.location.replace("/partials/login.html");
-    return; // Stop execution
+    console.warn("No token found. Redirecting...");
+    window.location.replace("partials/login.html");
+    return;
+  }
+
+  // --- IMMEDIATE SIDEBAR UPDATE ---
+  // This runs instantly so the sidebar is never empty
+  function updateSidebar() {
+    try {
+      const cleanToken = token.replace(/['"]+/g, "").trim();
+      const user = JSON.parse(atob(cleanToken.split(".")[1]));
+
+      const sideName = document.getElementById("profileNameDisplay");
+      const sideReg = document.getElementById("profileRegDisplay");
+
+      if (sideName)
+        sideName.textContent = (user.username || "Student").toUpperCase();
+      if (sideReg) sideReg.textContent = `Reg No: ${user.reg_no || "N/A"}`;
+    } catch (e) {
+      console.error("Sidebar Init Error:", e);
+    }
   }
 
   // =======================================
-  // 2. NAV & PARTIAL LOADER
+  // 3. DYNAMIC SCRIPT LOADER
+  // =======================================
+  function loadPageScript(pageName) {
+    const fileName = pageScripts[pageName];
+    if (!fileName) return;
+
+    const fullPath = `${SCRIPT_PATH}${fileName}`;
+
+    // Check if script is already in the DOM
+    const existingScript = document.querySelector(`script[src="${fullPath}"]`);
+
+    if (existingScript) {
+      // Script exists, just trigger the refresh function if available
+      if (pageName === "dashboard" && window.loadAllStats)
+        window.loadAllStats();
+      if (pageName === "profile" && window.loadProfile) window.loadProfile();
+      if (pageName === "results" && window.renderResults)
+        window.renderResults();
+    } else {
+      // Inject the script
+      const script = document.createElement("script");
+      script.src = fullPath;
+      script.onload = () => {
+        console.log(`Script Loaded: ${fileName}`);
+        // Run init immediately after load
+        if (pageName === "dashboard" && window.loadAllStats)
+          window.loadAllStats();
+        if (pageName === "profile" && window.loadProfile) window.loadProfile();
+      };
+      document.body.appendChild(script);
+    }
+  }
+
+  // =======================================
+  // 4. NAV & PARTIAL LOADER
   // =======================================
   const partials = [
     "dashboard",
@@ -59,9 +117,11 @@
       const text = await res.text();
       const wrapper = document.createElement("div");
       wrapper.innerHTML = text;
-      const navNode = wrapper.querySelector(".partial-nav");
-      const contentNode = wrapper.querySelector(".partial-content");
-      return { navNode, contentNode, name };
+      return {
+        navNode: wrapper.querySelector(".partial-nav"),
+        contentNode: wrapper.querySelector(".partial-content"),
+        name,
+      };
     } catch (err) {
       console.warn("Could not load partial", name, err);
       return null;
@@ -69,6 +129,10 @@
   }
 
   async function init() {
+    // 1. Fill Sidebar immediately
+    updateSidebar();
+
+    // 2. Load all partials
     for (const name of partials) {
       const p = await loadPartial(name);
       if (!p) continue;
@@ -80,7 +144,6 @@
           btn.classList.add("dynamic");
           btn.setAttribute("role", "menuitem");
           btn.setAttribute("tabindex", "0");
-          btn.addEventListener("keydown", (ev) => onMenuKeyDown(ev, btn));
           menuEl.appendChild(btn);
         }
       }
@@ -91,145 +154,59 @@
       }
     }
 
-    // ... inside init() function ...
-
-    // menu click handler
+    // 3. Event Listeners
     menuEl.addEventListener("click", (ev) => {
       const b = ev.target.closest("[data-page]");
       if (!b) return;
 
       const pageName = b.getAttribute("data-page");
 
-      // === NEW: HANDLE SIGN OUT ===
       if (pageName === "signout") {
-        // 1. Clear credentials
         localStorage.removeItem("token");
-        localStorage.removeItem("landingPage");
-
-        // 2. Redirect to Login
-        // USE THIS if your login is inside partials:
-        window.location.href = "/partials/login.html";
-
-        // OR USE THIS if your login is in the root folder:
-        // window.location.href = "/login.html";
+        window.location.href = "partials/login.html";
         return;
       }
-      // ============================
 
       showPage(pageName);
       if (sidebar && window.innerWidth <= 900)
         sidebar.classList.add("collapsed");
     });
-    // EXISTING: Sidebar click handler
-    menuEl.addEventListener("click", (ev) => {
-      const b = ev.target.closest("[data-page]");
-      if (!b) return;
-      showPage(b.getAttribute("data-page"));
-      // ... existing code ...
-    });
 
-    // === NEW: Content click handler (For links inside pages) ===
+    // Content internal links
     document.body.addEventListener("click", (ev) => {
-      // Check if the clicked element has 'data-go-to' attribute
       const link = ev.target.closest("[data-go-to]");
       if (link) {
-        ev.preventDefault(); // Stop normal link behavior
-        const targetPage = link.getAttribute("data-go-to");
-        showPage(targetPage); // Switch the view!
+        ev.preventDefault();
+        showPage(link.getAttribute("data-go-to"));
       }
     });
 
+    // Hamburger
     if (hamburger && sidebar) {
-      hamburger.setAttribute(
-        "aria-expanded",
-        String(!sidebar.classList.contains("collapsed"))
-      );
-      sidebar.setAttribute(
-        "aria-hidden",
-        String(sidebar.classList.contains("collapsed"))
-      );
       hamburger.addEventListener("click", () => {
-        const isCollapsed = sidebar.classList.toggle("collapsed");
-        hamburger.setAttribute("aria-expanded", String(!isCollapsed));
-        sidebar.setAttribute("aria-hidden", String(isCollapsed));
-        if (!isCollapsed) menuEl.querySelector("[data-page]")?.focus();
-        else hamburger.focus();
+        sidebar.classList.toggle("collapsed");
       });
     }
 
-    const landing = localStorage.getItem("landingPage") || null;
-    const first = landing
-      ? menuEl.querySelector(`[data-page="${landing}"]`)
-      : menuEl.querySelector("[data-page]");
+    // 4. Show Initial Page
+    const landing = localStorage.getItem("landingPage");
+    const firstPage = landing || "dashboard"; // Default to dashboard
 
-    if (first) showPage(first.getAttribute("data-page"));
+    // Safety check if dashboard button exists
+    if (menuEl.querySelector(`[data-page="${firstPage}"]`)) {
+      showPage(firstPage);
+    } else {
+      // Fallback to first available button
+      const firstBtn = menuEl.querySelector("[data-page]");
+      if (firstBtn) showPage(firstBtn.getAttribute("data-page"));
+    }
 
     localStorage.removeItem("landingPage");
-
-    if (!window.__PARTIALS_LOADED__) {
-      window.__PARTIALS_LOADED__ = true;
-      document.dispatchEvent(new CustomEvent("partials:loaded"));
-    }
-  }
-
-  function onMenuKeyDown(ev, btn) {
-    const key = ev.key;
-    if (key === "Enter" || key === " ") {
-      ev.preventDefault();
-      btn.click();
-      return;
-    }
-    if (key === "ArrowDown") {
-      ev.preventDefault();
-      focusNext(btn);
-      return;
-    }
-    if (key === "ArrowUp") {
-      ev.preventDefault();
-      focusPrev(btn);
-      return;
-    }
-    if (key === "Home") {
-      ev.preventDefault();
-      focusFirst();
-      return;
-    }
-    if (key === "End") {
-      ev.preventDefault();
-      focusLast();
-      return;
-    }
-    if (
-      key === "Escape" &&
-      sidebar &&
-      !sidebar.classList.contains("collapsed")
-    ) {
-      sidebar.classList.add("collapsed");
-      sidebar.setAttribute("aria-hidden", "true");
-      hamburger.setAttribute("aria-expanded", "false");
-      hamburger.focus();
-    }
-  }
-
-  function focusNext(current) {
-    const items = Array.from(menuEl.querySelectorAll("[data-page]"));
-    const idx = items.indexOf(current);
-    items[(idx + 1) % items.length]?.focus();
-  }
-  function focusPrev(current) {
-    const items = Array.from(menuEl.querySelectorAll("[data-page]"));
-    const idx = items.indexOf(current);
-    items[(idx - 1 + items.length) % items.length]?.focus();
-  }
-  function focusFirst() {
-    menuEl.querySelector("[data-page]")?.focus();
-  }
-  function focusLast() {
-    const items = menuEl.querySelectorAll("[data-page]");
-    items[items.length - 1]?.focus();
+    document.dispatchEvent(new CustomEvent("partials:loaded"));
   }
 
   function showPage(pageName) {
+    // Hide all
     pagesContainer
       .querySelectorAll(".partial-content")
       .forEach((p) => (p.style.display = "none"));
@@ -237,41 +214,21 @@
       .querySelectorAll("[data-page]")
       .forEach((b) => b.classList.remove("active"));
 
+    // Activate Button
     const activeBtn = menuEl.querySelector(`[data-page="${pageName}"]`);
     if (activeBtn) activeBtn.classList.add("active");
 
+    // Show Content
     const target = pagesContainer.querySelector(
       `.partial-content[data-page="${pageName}"]`,
     );
-
     if (target) {
       target.style.display = "";
-      const title =
-        target.getAttribute("data-title") || activeBtn?.textContent || pageName;
-      pageTitle.textContent = title.trim();
+      const title = target.getAttribute("data-title") || pageName;
+      pageTitle.textContent = title;
 
-      // === NEW: DATA POPULATION TRIGGERS ===
-
-      // 1. Refresh Profile & Stats when clicking 'profile' or 'dashboard'
-      if (
-        (pageName === "profile" || pageName === "dashboard") &&
-        typeof loadAllStats === "function"
-      ) {
-        loadAllStats();
-      }
-
-      // 2. Load the Lecturer Directory when clicking 'lecturers'
-      if (pageName === "lecturers" && typeof loadLecturers === "function") {
-        loadLecturers();
-      }
-
-      // Existing assignments check
-      if (
-        pageName === "assignments" &&
-        typeof window.renderTasks === "function"
-      ) {
-        window.renderTasks();
-      }
+      // === TRIGGER SCRIPT LOAD ===
+      loadPageScript(pageName);
     }
   }
 

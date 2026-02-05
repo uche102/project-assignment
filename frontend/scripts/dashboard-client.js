@@ -13,7 +13,33 @@ document.addEventListener("DOMContentLoaded", () => {
     courseCount,
     fees,
   ) {
-    // A. Update Text Info
+    // --- A. UPDATE SIDEBAR (Restored!) ---
+    const sideName = document.getElementById("profileNameDisplay");
+    const sideReg = document.getElementById("profileRegDisplay");
+    const sideCgpaText = document.getElementById("profileCgpaText");
+    const sideCgpaBar = document.getElementById("profileCgpaBar");
+
+    if (sideName) sideName.textContent = username.toUpperCase();
+    if (sideReg) sideReg.textContent = `Reg No: ${regNo || "N/A"}`;
+
+    // Update Sidebar CGPA Bar
+    if (sideCgpaText) sideCgpaText.textContent = `CGPA: ${cgpa}`;
+    if (sideCgpaBar) {
+      const val = parseFloat(cgpa);
+      const percentage = (val / 5) * 100;
+      sideCgpaBar.style.width = `${percentage}%`;
+
+      // Color Logic for Sidebar
+      if (val >= 4.5)
+        sideCgpaBar.style.background = "#28a745"; // Green
+      else if (val >= 3.5)
+        sideCgpaBar.style.background = "#17a2b8"; // Blue
+      else if (val >= 2.5)
+        sideCgpaBar.style.background = "#ffc107"; // Yellow
+      else sideCgpaBar.style.background = "#dc3545"; // Red
+    }
+
+    // --- B. UPDATE DASHBOARD MAIN AREA ---
     const nameDisplay = document.getElementById("displayUsername");
     const regDisplay = document.getElementById("displayRegNo");
     const topbarName = document.getElementById("topbarUsername");
@@ -22,7 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (topbarName) topbarName.textContent = username.toUpperCase();
     if (regDisplay) regDisplay.textContent = `Reg No: ${regNo || "N/A"}`;
 
-    // B. Update Simple Cards
     const resultsEl = document.getElementById("stat-results");
     const coursesEl = document.getElementById("totalCourses");
     const feesEl = document.getElementById("feesPaid");
@@ -33,39 +58,36 @@ document.addEventListener("DOMContentLoaded", () => {
     if (feesEl) feesEl.textContent = `₦${fees.toLocaleString()}`;
     if (cgpaCard) cgpaCard.textContent = cgpa;
 
-    // C. UPDATE CGPA VISUAL BAR (The Fix)
-    const cgpaBar = document.getElementById("cgpaProgressBar"); // Matches your HTML
-    const cgpaRemark = document.getElementById("cgpaRemark"); // Matches your HTML
+    // --- C. UPDATE DASHBOARD CGPA CARD (Visual Bar) ---
+    const dashBar = document.getElementById("cgpaProgressBar");
+    const dashRemark = document.getElementById("cgpaRemark");
 
-    if (cgpaBar) {
+    if (dashBar) {
       const val = parseFloat(cgpa);
       const percentage = (val / 5) * 100;
+      dashBar.style.width = `${percentage}%`;
 
-      // Animate Width
-      cgpaBar.style.width = `${percentage}%`;
-
-      // Set Color & Remark based on Class
-      let color = "#dc3545"; // Red (Default)
+      let color = "#dc3545";
       let remark = "Pass";
 
       if (val >= 4.5) {
-        color = "#28a745"; // Green
+        color = "#28a745";
         remark = "First Class (Excellent!)";
       } else if (val >= 3.5) {
-        color = "#17a2b8"; // Blue
+        color = "#17a2b8";
         remark = "Second Class Upper";
       } else if (val >= 2.5) {
-        color = "#ffc107"; // Yellow
+        color = "#ffc107";
         remark = "Second Class Lower";
       } else if (val >= 1.5) {
-        color = "#fd7e14"; // Orange
+        color = "#fd7e14";
         remark = "Third Class";
       }
 
-      cgpaBar.style.background = color;
-      if (cgpaRemark) {
-        cgpaRemark.textContent = remark;
-        cgpaRemark.style.color = color;
+      dashBar.style.background = color;
+      if (dashRemark) {
+        dashRemark.textContent = remark;
+        dashRemark.style.color = color;
       }
     }
   }
@@ -74,9 +96,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // 2. MAIN DATA LOADER
   // ===============================
   async function loadAllStats() {
-    console.log("Fetching Stats...");
-
-    // 1. GET & DECODE TOKEN
     let token = localStorage.getItem("token");
     if (!token) return;
     token = token.replace(/['"]+/g, "").trim();
@@ -86,9 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const user = JSON.parse(atob(token.split(".")[1]));
-
       if (user.exp && Date.now() >= user.exp * 1000) throw new Error("Expired");
-
       username = user.username || "Student";
       regNo = user.reg_no;
 
@@ -99,13 +116,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
     } catch (e) {
-      console.error("Token Error:", e);
       localStorage.removeItem("token");
       window.location.reload();
       return;
     }
 
-    // 2. FETCH ALL DATA IN PARALLEL (Faster)
     try {
       const [resResults, resCourses, resFees] = await Promise.all([
         fetch(`${API_BASE}/api/results/${encodeURIComponent(regNo)}`, {
@@ -119,53 +134,42 @@ document.addEventListener("DOMContentLoaded", () => {
         }),
       ]);
 
-      // 3. PROCESS RESULTS & CALCULATE CGPA
       let finalCGPA = "0.00";
       let resultCount = 0;
-      let transcriptHtml = ""; // For future use
 
       if (resResults.ok) {
         const data = await resResults.json();
         const myResults = data.results || [];
         resultCount = myResults.length;
 
-        // Calculate CGPA
         if (myResults.length > 0) {
           const gradePoints = { A: 5, B: 4, C: 3, D: 2, E: 1, F: 0 };
           let totalQP = 0,
             totalUnits = 0;
-
           myResults.forEach((r) => {
             const g = (r.grade || "F").toUpperCase().trim();
             const u = parseInt(r.unit || r.units || 0);
-
             if (gradePoints[g] !== undefined) {
               totalQP += gradePoints[g] * u;
               totalUnits += u;
             }
           });
-
-          if (totalUnits > 0) {
-            finalCGPA = (totalQP / totalUnits).toFixed(2);
-          }
+          if (totalUnits > 0) finalCGPA = (totalQP / totalUnits).toFixed(2);
         }
       }
 
-      // 4. PROCESS COURSES
       let courseCount = 0;
       if (resCourses.ok) {
         const data = await resCourses.json();
         courseCount = data.length;
       }
 
-      // 5. PROCESS FEES
       let feesTotal = 0;
       if (resFees.ok) {
         const data = await resFees.json();
         feesTotal = parseFloat(data.total || 0);
       }
 
-      // 6. UPDATE EVERYTHING
       updateDashboardUI(
         username,
         regNo,
@@ -179,13 +183,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ===============================
-  // 3. INITIALIZE
-  // ===============================
-  window.loadAllStats = loadAllStats; // Make global
-  loadAllStats(); // Run immediately
+  window.loadAllStats = loadAllStats;
+  loadAllStats();
 
-  // Auto-refresh when clicking tabs
   document.querySelectorAll(".menu-item").forEach((btn) => {
     btn.addEventListener("click", () => setTimeout(loadAllStats, 500));
   });

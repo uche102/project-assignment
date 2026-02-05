@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
       signupEl.className = "signup-container";
       signupEl.innerHTML = `
         <h1 style="margin-bottom: 5px;">Create Account</h1>
-        <p class="sub" style="margin-bottom: 20px;">Enter your details to join the portal</p>
+        <p class="sub" style="margin-bottom: 20px;">Enter your details</p>
         
         <input id="signupUsername" placeholder="Choose Username" class="input-field" style="margin-bottom: 10px; width: 100%;" />
         <input id="signupRegNo" placeholder="Registration Number (e.g. 2021/123456)" class="input-field" style="margin-bottom: 10px; width: 100%;" />

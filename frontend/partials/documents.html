@@ -1,51 +1,248 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-
-<div class="partial" data-name="documents">
-  <div class="partial-nav">
-    <button data-page="documents" class="menu-item dynamic">Documents</button>
-  </div>
-
-  <div
-    class="partial-content"
-    data-page="documents"
-    data-title="Documents"
-    style="display: none"
-  >
-    <section id="documents" class="page">
-      <h3>Documents</h3>
-      <p class="muted">
-        Download acceptance letter, receipts, or upload documents.
-      </p>
-
-      <div class="panel">
-        <ul class="list">
-          <li>
-            <a href="/mnt/data/Screenshot (40).png" download
-              >Download sample: acceptance_letter.png</a
-            >
-          </li>
-          <li>
-            <a href="#" id="downloadTrans">Request Transcript (mock)</a>
-          </li>
-        </ul>
-        <div class="upload">
-          <label class="btn"
-            >Upload Supporting Document
-            <input id="docUpload" type="file" hidden />
-          </label>
-          <span id="uploadStatus" class="muted"></span>
-        </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Documents</title>
+  </head>
+  <body>
+    <div class="partial" data-name="documents">
+      <div class="partial-nav">
+        <button data-page="documents" class="menu-item dynamic">
+          Documents
+        </button>
       </div>
-    </section>
-  </div>
-</div>
-</body>
+
+      <div
+        class="partial-content"
+        data-page="documents"
+        data-title="My Documents"
+        style="display: none"
+      >
+        <section id="documents" class="page">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 20px;
+            "
+          >
+            <div>
+              <h3>Official Documents</h3>
+              <p class="muted" style="margin-top: 5px">
+                Download your academic records and receipts.
+              </p>
+            </div>
+            <label
+              class="btn"
+              style="
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              "
+            >
+              <input id="docUpload" type="file" hidden />
+            </label>
+          </div>
+
+          <div class="panel" style="padding: 0">
+            <ul class="list" style="list-style: none; padding: 0; margin: 0">
+              <li
+                style="
+                  padding: 20px;
+                  border-bottom: 1px solid #eee;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                "
+              >
+                <div style="display: flex; align-items: center; gap: 15px">
+                  <div
+                    style="
+                      background: #e0f2fe;
+                      color: #0284c7;
+                      width: 45px;
+                      height: 45px;
+                      border-radius: 8px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 1.5rem;
+                    "
+                  >
+                    📄
+                  </div>
+                  <div>
+                    <strong style="display: block; color: #333"
+                      >Provisional Admission Letter</strong
+                    >
+                    <span class="muted" style="font-size: 0.85rem"
+                      >PDF • 2024/2025 Session</span
+                    >
+                  </div>
+                </div>
+                <a
+                  href="#"
+                  class="btn"
+                  style="
+                    background: #f1f5f9;
+                    color: #333;
+                    padding: 8px 16px;
+                    font-size: 0.85rem;
+                    border: 1px solid #ddd;
+                  "
+                  >Download</a
+                >
+              </li>
+
+              <li
+                style="
+                  padding: 20px;
+                  border-bottom: 1px solid #eee;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                "
+              >
+                <div style="display: flex; align-items: center; gap: 15px">
+                  <div
+                    style="
+                      background: #dcfce7;
+                      color: #16a34a;
+                      width: 45px;
+                      height: 45px;
+                      border-radius: 8px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 1.5rem;
+                    "
+                  >
+                    📝
+                  </div>
+                  <div>
+                    <strong style="display: block; color: #333"
+                      >Course Registration Form</strong
+                    >
+                    <span class="muted" style="font-size: 0.85rem"
+                      >PDF • First Semester</span
+                    >
+                  </div>
+                </div>
+                <a
+                  href="#"
+                  class="btn"
+                  style="
+                    background: #f1f5f9;
+                    color: #333;
+                    padding: 8px 16px;
+                    font-size: 0.85rem;
+                    border: 1px solid #ddd;
+                  "
+                  >Download</a
+                >
+              </li>
+
+              <li
+                style="
+                  padding: 20px;
+                  border-bottom: 1px solid #eee;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                "
+              >
+                <div style="display: flex; align-items: center; gap: 15px">
+                  <div
+                    style="
+                      background: #fef9c3;
+                      color: #ca8a04;
+                      width: 45px;
+                      height: 45px;
+                      border-radius: 8px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 1.5rem;
+                    "
+                  >
+                    🧾
+                  </div>
+                  <div>
+                    <strong style="display: block; color: #333"
+                      >School Fees Receipt</strong
+                    >
+                    <span class="muted" style="font-size: 0.85rem"
+                      >PDF • ₦45,000.00 • Verified</span
+                    >
+                  </div>
+                </div>
+                <a
+                  href="#"
+                  class="btn"
+                  style="
+                    background: #f1f5f9;
+                    color: #333;
+                    padding: 8px 16px;
+                    font-size: 0.85rem;
+                    border: 1px solid #ddd;
+                  "
+                  >Print</a
+                >
+              </li>
+
+              <li
+                style="
+                  padding: 20px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                "
+              >
+                <div style="display: flex; align-items: center; gap: 15px">
+                  <div
+                    style="
+                      background: #f3e8ff;
+                      color: #9333ea;
+                      width: 45px;
+                      height: 45px;
+                      border-radius: 8px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 1.5rem;
+                    "
+                  >
+                    🖼️
+                  </div>
+                  <div>
+                    <strong style="display: block; color: #333"
+                      >NACOS Departmental ID</strong
+                    >
+                    <span class="muted" style="font-size: 0.85rem"
+                      >JPG • Preview Available</span
+                    >
+                  </div>
+                </div>
+                <a
+                  href="../Untitled.jpeg"
+                  download="NACOS_ID.jpg"
+                  class="btn"
+                  style="
+                    background: #0a8a3a;
+                    color: white;
+                    padding: 8px 16px;
+                    font-size: 0.85rem;
+                  "
+                  >Download</a
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+      </div>
+    </div>
+  </body>
 </html>

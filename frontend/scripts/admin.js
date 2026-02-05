@@ -262,3 +262,33 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+async function createCourse() {
+  const code = document.getElementById("newCourseCode").value;
+  const title = document.getElementById("newCourseTitle").value;
+  const unit = document.getElementById("newCourseUnit").value;
+  const level = document.getElementById("newCourseLevel").value;
+  const token = localStorage.getItem("admin_token");
+
+  if (!code || !title) return alert("Code and Title are required");
+
+  try {
+    const res = await fetch("http://localhost:4000/api/admin/add-course", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ code, title, unit, level }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert("Course Created!");
+      location.reload();
+    } else {
+      alert("Error: " + data.error);
+    }
+  } catch (e) {
+    console.error(e);
+    alert("Server Error");
+  }
+}

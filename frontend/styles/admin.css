@@ -73,4 +73,40 @@ body {
     }
 
     button.active {
-        background: #2e7d32 !important
+        background: #2e7d32 !important;
+    }
+    /* --- SAFE WATERMARK OVERLAY --- */
+/* --- WATERMARK OVERLAY (Black Remover) --- */
+/* --- WATERMARK OVERLAY (Fixed for Light Images) --- */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  /* Your Image Path */
+  background-image: url('../nacos.png'); 
+  
+  background-repeat: no-repeat;
+  background-position: center;
+  
+/* CHANGE THIS: Use 'px' instead of '%' to stop blurry stretching */
+  background-size: 500px; 
+  
+  /* Optional: Tries to make resizing sharper */
+  image-rendering: -webkit-optimize-contrast;
+  
+  /* OPACITY CONTROL: 
+     0.1 = Very Faint
+     0.3 = Visible
+     0.5 = Strong 
+  */
+  opacity: 0.5; 
+  
+  z-index: 100;
+  pointer-events: none; /* Allows clicks to pass through */
+
+  
+}

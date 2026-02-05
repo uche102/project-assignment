@@ -1,13 +1,45 @@
-<div class="partial" data-name="profile">
-  <div class="partial-nav">
-    <button data-page="profile" class="menu-item dynamic">Profile</button>
-  </div>
+<div class="partial-nav">
+  <button data-page="profile" class="menu-item">Profile</button>
+</div>
 
-  <div class="partial-content" data-page="profile" data-title="Student Profile" style="display: none">
-    <section id="profile" class="page">
-      <h3>Student Profile</h3>
-      <div class="panel profile-grid">
+<div class="partial-content" data-page="profile" data-title="Student Profile">
+  <section id="profile" class="page">
+    
+    <div class="panel" style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+      <div style="width: 80px; height: 80px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
+        👤
+      </div>
+      <div>
+        <h2 id="prof-name" style="margin: 0; color: #1e293b;">LOADING...</h2>
+        <p id="prof-reg" style="color: #64748b; margin: 5px 0 0 0;">Reg No: ...</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3 style="margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">Personal Details</h3>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <label style="display:block; font-size: 0.85rem; color: #64748b; margin-bottom: 5px;">Full Name</label>
+          <div id="field-name" style="background: #f8fafc; padding: 10px; border-radius: 6px; font-weight: 500;">-</div>
         </div>
-    </section>
-  </div>
+
+        <div>
+          <label style="display:block; font-size: 0.85rem; color: #64748b; margin-bottom: 5px;">Reg Number</label>
+          <div id="field-reg" style="background: #f8fafc; padding: 10px; border-radius: 6px; font-weight: 500;">-</div>
+        </div>
+
+        <div>
+          <label style="display:block; font-size: 0.85rem; color: #64748b; margin-bottom: 5px;">School Email</label>
+          <div id="field-email" style="background: #f8fafc; padding: 10px; border-radius: 6px; font-weight: 500;">-</div>
+        </div>
+
+        <div>
+          <label style="display:block; font-size: 0.85rem; color: #64748b; margin-bottom: 5px;">Department</label>
+          <div style="background: #f8fafc; padding: 10px; border-radius: 6px; font-weight: 500;">Computer Science</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
 </div>

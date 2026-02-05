@@ -140,3 +140,27 @@ input:focus {
 .small a:hover {
   text-decoration: underline;
 }
+/* --- WATERMARK OVERLAY (Fixed for Frontend Folder) --- */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  /* The '..' goes up one folder to find the image in 'frontend' */
+  background-image: url('../nacos.png'); 
+  
+  background-repeat: no-repeat;
+  background-position: center;
+ 
+  background-size: 500px; 
+  
+  /* Optional: Tries to make resizing sharper */
+  image-rendering: -webkit-optimize-contrast;
+  
+  opacity: 0.5; /* Adjust visibility: 0.1 (faint) to 0.3 (darker) */
+  z-index: 100;
+  pointer-events: none;
+}
