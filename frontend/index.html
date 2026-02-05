@@ -11,9 +11,7 @@
   <body>
     <div class="wrapper">
       <div class="app">
-        <!-- MAIN -->
         <main class="main">
-          <!-- TOPBAR -->
           <header class="topbar">
             <div class="top-left">
               <button
@@ -29,30 +27,33 @@
             </div>
             <div class="top-right">
               <div class="user">
-                <img src="/course.png" alt="avatar" class="avatar" />
+                <img src="course.png" alt="avatar" class="avatar" />
                 <div class="user-info">
-                  <div id="topbarUsername"></div>
-                  <div class="meta"></div>
+                  <div id="topbarUsername">Student</div>
                 </div>
               </div>
             </div>
           </header>
 
-          <!-- CONTENT -->
           <section class="content">
             <div class="brand">
-              <img
-                src="/download.png"
-                alt="University logo"
-                class="brand-logo"
-              />
-              <div class="brand-text">
-                <strong>University of Nigeria</strong>
-                <small>Student Portal</small>
-              </div>
+              <img src="download.png" alt="UNN Logo" class="brand-logo" />
+              <div class="brand-text"></div>
             </div>
 
             <aside id="sidebar" class="sidebar collapsed">
+              <div class="sidebar-header">
+                <img src="download.png" class="side-logo" alt="UNN Logo" />
+
+                <div class="side-info">
+                  <h4 id="sideName">Loading...</h4>
+                  <p id="sideReg">Reg: ...</p>
+                  <span class="badge">Computer Science</span>
+                </div>
+              </div>
+
+              <hr class="sidebar-divider" />
+
               <nav class="menu" role="navigation" aria-label="Primary">
                 <div id="menu" class="menu-placeholder" role="menu"></div>
               </nav>
@@ -64,20 +65,18 @@
         </main>
       </div>
     </div>
+
     <script>
       window.API_BASE = "http://localhost:4000";
     </script>
-    <!-- Paystack library -->
+
     <script src="https://js.paystack.co/v1/inline.js"></script>
 
-    <!-- JS Scripts -->
-    <script src="/scripts/nav-loader.js"></script>
-    <script src="/scripts/paystack.js"></script>
-    <script src="/scripts/results-client.js"></script>
-    <script src="/scripts/profile-client.js"></script>
-    <script src="/scripts/lecturer-client.js"></script>
-    <script src="/scripts/course-reg-client.js"></script>
-    <script src="/scripts/dashboard-client.js"></script>
-    <script src="/scripts/borrow-client.js"></script>
+    <script src="scripts/nav-loader.js"></script>
+    <script src="scripts/paystack.js"></script>
+    <script src="scripts/results-client.js"></script>
+    <script src="scripts/profile-client.js"></script>
+    <script src="scripts/course-reg-client.js"></script>
+    <script src="scripts/dashboard-client.js"></script>
   </body>
 </html>
