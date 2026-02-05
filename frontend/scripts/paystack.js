@@ -65,7 +65,7 @@
       const handler = PaystackPop.setup({
         key: PAYSTACK_PUBLIC_KEY,
         email: `${user.username || "student"}@unn.edu.ng`,
-        amount: amountNaira * 100, // Convert to Kobo
+        amount: amountNaira * 100, // Converts to Kobo
         currency: "NGN",
         ref: `SCH_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
         metadata: {
@@ -81,7 +81,7 @@
         // 5. ON SUCCESS: "Verify" and Save
         // ============================================================
         callback: function (response) {
-          // This "Verifying..." text is just visual while we save to DB
+          // This "Verifying..."
           payBtn.textContent = "Verifying...";
           payBtn.disabled = true;
 
@@ -91,7 +91,7 @@
           );
           localStorage.setItem("fees_paid", currentTotal + amountNaira);
 
-          // B. UPDATE UI IMMEDIATELY
+          // B. UPDATES UI IMMEDIATELY
           window.dispatchEvent(new Event("statsUpdated"));
 
           // C. BACKEND SAVE (The "Verification" Step)
@@ -112,14 +112,14 @@
               alert("Payment Verified & Saved!");
               payBtn.textContent = "Pay Again";
               payBtn.disabled = false;
-              payBtn.style.background = "#16a34a"; // Green
+              payBtn.style.background = "#16a34a"; 
 
-              // Refresh Dashboard one last time to be sure
+              // Refresh Dashboard again
               window.dispatchEvent(new Event("statsUpdated"));
             })
             .catch((err) => {
               console.error("Backend Sync Error:", err);
-              // Even if DB fails, we let them know it worked locally
+              // Even if DB fails,  it worked locally
               alert("Payment successful (Local). Backend sync pending.");
               payBtn.disabled = false;
             });
@@ -134,7 +134,7 @@
   }
 
   // 6. Run Init Logic
-  // We check if document is ready, or wait for it
+  //  checks if document is ready, or wait for it
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", async () => {
       await loadPaystackKey();

@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (e) {}
     }
 
-    // 2. Fetch ALREADY REGISTERED courses from Database
+    // 2. Fetchs ALREADY REGISTERED courses from Database
     let registeredCodes = [];
     if (token) {
       try {
@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
         if (res.ok) {
           const data = await res.json();
-          // Extract just the codes (e.g. ["CSC201", "MTH201"])
+          // Extract course codes
           registeredCodes = data.map((r) => r.course_code);
         }
       } catch (err) {
@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Button Logic: Green/Red based on status
         const btnText = isRegistered ? "Remove" : "Register";
-        const btnColor = isRegistered ? "#dc3545" : "#007bff"; // Red or Blue
+        const btnColor = isRegistered ? "#dc3545" : "#007bff"; 
 
         return `
       <div class="course-item" style="padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
@@ -109,11 +109,11 @@ document.addEventListener("DOMContentLoaded", () => {
               } successfully!`
             );
 
-            // 1. BROADCAST: Tell the Dashboard to refresh its numbers
+            //   Dashboard  refresh 
             window.dispatchEvent(new Event("statsUpdated"));
 
             // 2. RE-RENDER: Update the local button colors (Register -> Remove)
-            // We clear the flag so it fetches the fresh list from the DB
+            // clear  flag so it fetches the fresh list from the DB
             list.dataset.loaded = "false";
             renderCourses();
           } else {

@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (res.ok) {
           localStorage.setItem("admin_token", data.token);
-          location.reload(); // Reload to refresh state
+          location.reload(); // Reloads to refresh state
         } else {
           alert("Login Failed: " + (data.error || "Unknown error"));
         }

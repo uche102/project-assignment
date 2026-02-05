@@ -2,7 +2,7 @@
    Body.js - Global Utilities
    ====================================== */
 
-// Attach directly to window to bypass module scoping
+//   window  bypasses module scoping
 window.generateCalendarPDF = function () {
   console.log("PDF Generation Triggered...");
   const element = document.getElementById("academic-calendar");

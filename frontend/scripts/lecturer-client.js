@@ -2,7 +2,7 @@ async function loadLecturers() {
   const listContainer = document.getElementById("lecturerList");
   if (!listContainer) return;
 
-  // Use global API_BASE
+  //global API_BASE
   const API_BASE = window.API_BASE || "http://localhost:4000";
   const token = localStorage.getItem("token")?.replace(/['"]+/g, "").trim();
 
@@ -16,7 +16,7 @@ async function loadLecturers() {
     }
     const username = user.username || "student";
 
-    // 2. Fetch My Courses (To identify "My Lecturers")
+    // 2. Fetch My Courses To identify "My Lecturers"
     let myCodes = [];
     try {
       const coursesRes = await fetch(
@@ -27,7 +27,7 @@ async function loadLecturers() {
       );
       if (coursesRes.ok) {
         const myCourses = await coursesRes.json();
-        // Safety check: ensure myCourses is an array
+        // Safety check: ensure myCourses is  array
         if (Array.isArray(myCourses)) {
           myCodes = myCourses.map((c) => c.course_code);
         }
@@ -45,7 +45,7 @@ async function loadLecturers() {
     const responseData = await res.json();
     console.log("DEBUG: Server sent this data:", responseData);
 
-    // === THE FIX FOR "MAP IS NOT A FUNCTION" ===
+   
     // If server sent an array: use it.
     // If server sent an object with .rows: use .rows.
     // Otherwise: default to empty array [].
@@ -56,15 +56,14 @@ async function loadLecturers() {
       lecturers = responseData.rows;
     } else {
       console.error("Data format error: Expected Array, got", responseData);
-      listContainer.innerHTML =
-        "<p style='color:red; padding:20px;'>Error: Server data format is invalid.</p>";
+      
       return;
     }
 
     // 4. Handle Empty List
     if (lecturers.length === 0) {
       listContainer.innerHTML =
-        "<p style='padding:20px; color:#666;'>No lecturers found in the directory.</p>";
+        "<p>No lecturers found in the directory.</p>";
       return;
     }
 
@@ -74,11 +73,11 @@ async function loadLecturers() {
         // Handle if courses is missing or null
         const coursesArray = Array.isArray(lec.courses) ? lec.courses : [];
 
-        // Check if this lecturer teaches any of my courses
+        // Check if lecturer exists
         const isMyLecturer = coursesArray.some((c) => myCodes.includes(c.code));
 
         const badge = isMyLecturer
-          ? `<span style="background:#e9f6ec; color:#0a8a3a; padding:2px 8px; border-radius:10px; font-size:0.7rem; margin-left:8px;">Your Lecturer</span>`
+          ? `<span>Your Lecturer</span>`
           : "";
 
         // Build Course Badges
@@ -87,28 +86,28 @@ async function loadLecturers() {
             ? coursesArray
                 .map(
                   (c) =>
-                    `<span style="background:#f3f4f6; color:#555; padding:2px 6px; border-radius:4px; font-size:0.75rem; margin-right:4px; border:1px solid #eee;">${c.code}</span>`,
+                    `<span>${c.code}</span>`,
                 )
                 .join("")
-            : '<span style="color:#999; font-size:0.8rem;">No courses assigned</span>';
+            : '<span>No courses assigned</span>';
 
         return `
-        <div class="lecturer-item" style="display: flex; align-items: center; justify-content: space-between; padding: 15px; border-bottom: 1px solid #eee;">
-          <div style="display: flex; align-items: center; gap: 15px;">
-            <div style="width: 50px; height: 50px; border-radius: 50%; background:#0a8a3a; color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.2rem;">
+        <div class="lecturer-item">
+          <div>
+            <div>
                  ${lec.name ? lec.name.charAt(0) : "L"}
             </div>
 
             <div>
-              <div style="display:flex; align-items:center;">
-                 <strong style="color: #333;">${lec.name}</strong> ${badge}
+              <div>
+                 <strong>${lec.name}</strong> ${badge}
               </div>
-              <p style="font-size: 0.85rem; color: #666; margin: 2px 0;">📍 ${lec.office || "Main Office"}</p>
-              <div style="margin-top:4px;">${courseBadges}</div>
+              <p > ${lec.office || "Main Office"}</p>
+              <div >${courseBadges}</div>
             </div>
           </div>
           
-          <button onclick="openChat('${lec.name}', '${lec.email}')" class="primary-btn" style="padding: 5px 15px; font-size: 0.8rem; cursor: pointer; background:#007bff; color:white; border:none; border-radius:4px;">
+          <button onclick="openChat('${lec.name}', '${lec.email}')" class="primary-btn">
             Message
           </button>
         </div>
@@ -118,7 +117,7 @@ async function loadLecturers() {
   } catch (err) {
     console.error("Lecturer Load Error:", err);
     listContainer.innerHTML =
-      "<p style='color:red; padding:20px;'>Unable to load directory. Is the server running?</p>";
+      "<p style='color:red;'>Unable to load directory. Is the server running?</p>";
   }
 }
 

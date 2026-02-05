@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       form.appendChild(signupEl);
 
-      // --- ADDED: Cancel/Back Button Logic ---
+      //  Cancel/Back Button Logic ---
       signupEl.querySelector("#cancelSignup").addEventListener("click", () => {
         signupEl.remove();
         signupEl = null;
@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
             status.style.color = "green";
             status.textContent = "Success! Returning to login...";
 
-            // Auto-fill login and return
+            // Auto fills login and return
             setTimeout(() => {
               document.getElementById("username").value = u;
               document.getElementById("password").value = p;

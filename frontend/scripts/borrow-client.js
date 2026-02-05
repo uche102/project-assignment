@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // 4. THE FIX: TRIGGER DASHBOARD UPDATE
     // ==========================================
-    // This sends a signal to dashboard-client.js immediately
+    // sends message to dashboard-client.js immediately
    window.dispatchEvent(new Event("statsUpdated"));
 
     // Re-render the list to show green/red button change

@@ -41,7 +41,7 @@
       const username = (user.username || "Student").toUpperCase();
       const regNo = user.reg_no || "N/A";
 
-      // 1. Update Sidebar Profile (The new part)
+      // 1. Update Sidebar Profile
       const sideName = document.getElementById("sideName");
       const sideReg = document.getElementById("sideReg");
 
