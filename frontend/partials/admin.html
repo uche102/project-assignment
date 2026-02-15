@@ -4,87 +4,92 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Portal - UNN</title>
-
     <link rel="stylesheet" href="/styles/admin.css" />
   </head>
   <body>
     <div class="admin-wrapper">
       <header>
         <h2>Admin Control Panel</h2>
-        <p id="adminLoginStatus">Restricted Access</p>
+        <div class="header-right">
+          <p id="adminLoginStatus">Restricted Access</p>
+        </div>
       </header>
 
       <div id="adminLogin" class="container login-panel">
         <h3>Login Required</h3>
         <p class="muted">Enter your admin credentials</p>
-
         <label>Username</label>
         <input type="text" id="adminUser" placeholder="e.g. uche" />
-
         <label>Password</label>
-        <input type="password" id="adminPass" placeholder="•••••••" />
-
+        <input type="password" id="adminPass" placeholder="..." />
         <button id="adminLoginBtn">Secure Login</button>
       </div>
 
       <div id="adminDashboard" class="hidden">
-        <div class="dashboard-grid">
-          <div class="container card border-green">
-            <h3>➕ Create New Course</h3>
-            <p class="muted">Add a course to the database.</p>
-
-            <input
-              type="text"
-              id="newCourseCode"
-              placeholder="Code (e.g. CSC201)"
-            />
-            <input
-              type="text"
-              id="newCourseTitle"
-              placeholder="Title (e.g. Java Programming)"
-            />
-
-            <div class="row">
-              <input type="number" id="newCourseUnit" placeholder="Units (3)" />
-              <input
-                type="number"
-                id="newCourseLevel"
-                placeholder="Level (200)"
-              />
+        <div class="grid-container">
+          <div class="card border-green">
+            <div class="card-header">
+              <h3>Create New Course</h3>
             </div>
-
-            <button onclick="createCourse()" class="btn-dark">
-              Add Course
-            </button>
+            <div class="card-body">
+              <p class="muted">Add a course to the database.</p>
+              <input
+                type="text"
+                id="newCourseCode"
+                placeholder="Code (e.g. CSC201)"
+              />
+              <input
+                type="text"
+                id="newCourseTitle"
+                placeholder="Title (e.g. Java Programming)"
+              />
+              <div class="row">
+                <input
+                  type="number"
+                  id="newCourseUnit"
+                  placeholder="Units"
+                  style="width: 48%"
+                />
+                <input
+                  type="text"
+                  id="newCourseLevel"
+                  placeholder="Lvl (400)"
+                  style="width: 48%"
+                />
+              </div>
+              <button onclick="createCourse()">Create Course</button>
+              <p id="createStatus"></p>
+            </div>
           </div>
 
-          <div id="availablecourse" class="container card border-blue">
-            <h3>🔗 Assign Lecturer</h3>
-            <p class="muted">Link a course to a lecturer.</p>
-
-            <label>Select Course</label>
-            <select id="assignCourseSelect">
-              <option value="">Loading...</option>
-            </select>
-
-            <label>Select Lecturer</label>
-            <select id="assignLecturerSelect">
-              <option value="">Loading...</option>
-            </select>
-
-            <button onclick="assignCourse()">Link Now</button>
-            <p id="assignStatus"></p>
+          <div class="card border-blue">
+            <div class="card-header">
+              <h3> Assign Course</h3>
+            </div>
+            <div class="card-body">
+              <p class="muted">Link a lecturer to a course.</p>
+              <label>Select Course</label>
+              <select id="assignCourseSelect">
+                <option value="">Loading...</option>
+              </select>
+              <label>Select Lecturer</label>
+              <select id="assignLecturerSelect">
+                <option value="">Loading...</option>
+              </select>
+              <button onclick="assignCourse()" class="btn-blue">
+                Link Now
+              </button>
+              <p id="assignStatus"></p>
+            </div>
           </div>
-        </div>
 
-        <div class="container card">
-          <h3>📂 Bulk Data Uploads</h3>
-
-          <div class="dashboard-grid">
-            <div>
-              <h4>1. Upload Results (CSV)</h4>
+          <div class="card border-orange">
+            <div class="card-header">
+              <h3> Upload Results</h3>
+            </div>
+            <div class="card-body">
               <p class="muted small">
-                Headers: student, course_code, grade, unit
+                CSV Headers: student, course_code, grade, unit
               </p>
               <input type="file" id="resultFile" accept=".csv" />
               <button id="uploadResultsBtn" class="btn-grey">
@@ -92,10 +97,16 @@
               </button>
               <span id="uploadStatus"></span>
             </div>
+          </div>
 
-            <div>
-              <h4>2. Upload Lecturers (CSV)</h4>
-              <p class="muted small">Headers: name, email, office, courses</p>
+          <div class="card border-purple">
+            <div class="card-header">
+              <h3>Upload Lecturers</h3>
+            </div>
+            <div class="card-body">
+              <p class="muted small">
+                CSV Headers: name, email, office, courses
+              </p>
               <input type="file" id="lecturerFile" accept=".csv" />
               <button id="uploadLecturersBtn" class="btn-grey">
                 Upload Lecturers

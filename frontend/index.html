@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Student Portal — Prototype</title>
 
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;"
+    />
+
     <link rel="stylesheet" href="styles/body.css" />
     <link rel="stylesheet" href="styles/nav.css" />
   </head>
@@ -25,34 +30,27 @@
               </button>
               <h2 id="pageTitle">Dashboard</h2>
             </div>
-            <div class="top-right">
-              <div class="user">
-                <img src="course.png" alt="avatar" class="avatar" />
-                <div class="user-info">
-                  <div id="topbarUsername">Student</div>
-                </div>
-              </div>
-            </div>
+            <div class="top-right"></div>
           </header>
 
           <section class="content">
             <div class="brand">
               <img src="download.png" alt="UNN Logo" class="brand-logo" />
-              <div class="brand-text"></div>
+              <div class="brand-text">
+                <strong>University of Nigeria</strong>
+                <small>Student Portal</small>
+              </div>
             </div>
 
             <aside id="sidebar" class="sidebar collapsed">
               <div class="sidebar-header">
-                <!-- <img src="download.png" class="side-logo" alt="UNN Logo" /> -->
-
+                <img src="download.png" class="side-logo" alt="UNN Logo" />
                 <div class="side-info">
                   <h4 id="sideName">Loading...</h4>
                   <p id="sideReg">Reg: ...</p>
                   <span class="badge">Computer Science</span>
                 </div>
               </div>
-
-              <hr class="sidebar-divider" />
 
               <nav class="menu" role="navigation" aria-label="Primary">
                 <div id="menu" class="menu-placeholder" role="menu"></div>
@@ -71,11 +69,9 @@
     </script>
 
     <script src="https://js.paystack.co/v1/inline.js"></script>
-
     <script src="scripts/nav-loader.js"></script>
     <script src="scripts/paystack.js"></script>
     <script src="scripts/results-client.js"></script>
-    <script src="scripts/lecturer-client.js"></script>
     <script src="scripts/profile-client.js"></script>
     <script src="scripts/course-reg-client.js"></script>
     <script src="scripts/dashboard-client.js"></script>

@@ -1,5 +1,3 @@
-/* frontend/scripts/admin.js */
-
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Admin Script Loaded");
   const API_BASE = "http://localhost:4000";
@@ -23,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- 2. LOGIN LOGIC ---
   if (loginBtn) {
     loginBtn.addEventListener("click", async () => {
+      // NOTE: We send the input value as 'reg_no' because the backend login expects 'reg_no'
       const username = document.getElementById("adminUser").value;
       const password = document.getElementById("adminPass").value;
 
@@ -39,7 +38,9 @@ document.addEventListener("DOMContentLoaded", () => {
           localStorage.setItem("admin_token", data.token);
           location.reload(); // Reloads to refresh state
         } else {
-          alert("Login Failed: " + (data.error || "Unknown error"));
+          alert(
+            "Login Failed: " + (data.error || "Check username (use 'admin')"),
+          );
         }
       } catch (err) {
         console.error(err);
@@ -56,36 +57,25 @@ document.addEventListener("DOMContentLoaded", () => {
   function unlockDashboard() {
     if (loginPanel) loginPanel.style.display = "none";
     if (dashboard) dashboard.style.display = "block";
-
-    // LOAD DATA IMMEDIATELY
     loadDropdowns();
   }
 
-  // --- 3. DATA LOADER ---
+  // --- 3. DATA LOADER (Courses & Lecturers) ---
   async function loadDropdowns() {
-    console.log("Attempting to fetch Dropdown Data...");
     const courseSelect = document.getElementById("assignCourseSelect");
     const lecturerSelect = document.getElementById("assignLecturerSelect");
     const token = localStorage.getItem("admin_token");
 
     if (!courseSelect || !lecturerSelect) return;
 
-    //  FETCH COURSES
+    // Fetch Courses
     try {
-      courseSelect.innerHTML = "<option>Loading Courses...</option>";
-
       const res = await fetch(`${API_BASE}/api/admin/courses`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (!res.ok) throw new Error(`Status: ${res.status}`);
-
       const courses = await res.json();
 
-      if (courses.length === 0) {
-        courseSelect.innerHTML =
-          "<option>No Courses Found (Create one!)</option>";
-      } else {
+      if (Array.isArray(courses)) {
         courseSelect.innerHTML =
           '<option value="">-- Select Course --</option>' +
           courses
@@ -96,26 +86,17 @@ document.addEventListener("DOMContentLoaded", () => {
             .join("");
       }
     } catch (err) {
-      console.error("Course Fetch Error:", err);
-      courseSelect.innerHTML = "<option>Error loading courses</option>";
+      console.error("Course Load Error", err);
     }
 
-    //  FETCH LECTURERS
+    // Fetch Lecturers
     try {
-      lecturerSelect.innerHTML = "<option>Loading Lecturers...</option>";
-
       const res = await fetch(`${API_BASE}/api/lecturers`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (!res.ok) throw new Error(`Status: ${res.status}`);
-
       const lecturers = await res.json();
 
-      if (lecturers.length === 0) {
-        lecturerSelect.innerHTML =
-          "<option>No Lecturers Found (Upload them!)</option>";
-      } else {
+      if (Array.isArray(lecturers)) {
         lecturerSelect.innerHTML =
           '<option value="">-- Select Lecturer --</option>' +
           lecturers
@@ -123,12 +104,11 @@ document.addEventListener("DOMContentLoaded", () => {
             .join("");
       }
     } catch (err) {
-      console.error("Lecturer Fetch Error:", err);
-      lecturerSelect.innerHTML = "<option>Error loading lecturers</option>";
+      console.error("Lecturer Load Error", err);
     }
   }
 
-  // --- 4. ASSIGN FUNCTION (Global) ---
+  // --- 4. ASSIGN COURSE FUNCTION ---
   window.assignCourse = async function () {
     const courseCode = document.getElementById("assignCourseSelect").value;
     const lecturerId = document.getElementById("assignLecturerSelect").value;
@@ -156,20 +136,18 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (res.ok) {
-        statusEl.textContent = "Success! Course Linked.";
+        statusEl.textContent = "Success! Linked.";
         statusEl.style.color = "green";
       } else {
-        const data = await res.json();
-        statusEl.textContent = "Failed: " + (data.error || "Unknown");
+        statusEl.textContent = "Failed.";
         statusEl.style.color = "red";
       }
     } catch (e) {
-      console.error(e);
-      statusEl.textContent = "Server Error";
+      statusEl.textContent = "Error";
     }
   };
 
-  //  CREATE COURSE LOGIC  
+  // --- 5. CREATE COURSE FUNCTION ---
   window.createCourse = async function () {
     const code = document.getElementById("newCourseCode").value;
     const title = document.getElementById("newCourseTitle").value;
@@ -177,11 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const level = document.getElementById("newCourseLevel").value;
     const token = localStorage.getItem("admin_token");
 
-    // Validation
-    if (!code || !title) {
-      alert("Please enter a Course Code and Title.");
-      return;
-    }
+    if (!code || !title) return alert("Code and Title are required");
 
     try {
       const res = await fetch(`${API_BASE}/api/admin/add-course`, {
@@ -191,24 +165,80 @@ document.addEventListener("DOMContentLoaded", () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          code: code.trim(),
-          title: title.trim(),
+          code: code,
+          title: title,
           unit: parseInt(unit) || 3,
           level: parseInt(level) || 100,
         }),
       });
 
-      const data = await res.json();
-
       if (res.ok) {
-        alert("Success! Course Created: " + code);
+        alert("Course Created!");
         location.reload();
       } else {
-        alert("Error: " + (data.error || "Could not create course"));
+        alert("Failed to create course.");
       }
     } catch (e) {
-      console.error(e);
-      alert("Server Error: Check your console.");
+      alert("Network Error");
     }
   };
+
+  
+  const uploadResultsBtn = document.getElementById("uploadResultsBtn");
+  if (uploadResultsBtn) {
+    uploadResultsBtn.addEventListener("click", async () => {
+      const fileInput = document.getElementById("resultFile");
+      const file = fileInput.files[0];
+      const token = localStorage.getItem("admin_token");
+
+      if (!file) return alert("Please select a CSV file first.");
+
+      
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/upload-results`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` }, 
+          body: formData,
+        });
+
+        const data = await res.json();
+        if (res.ok) alert(data.message || "Upload Successful");
+        else alert("Upload Failed: " + data.error);
+      } catch (err) {
+        alert("Upload Error: " + err.message);
+      }
+    });
+  }
+
+
+  const uploadLecturersBtn = document.getElementById("uploadLecturersBtn");
+  if (uploadLecturersBtn) {
+    uploadLecturersBtn.addEventListener("click", async () => {
+      const fileInput = document.getElementById("lecturerFile");
+      const file = fileInput.files[0];
+      const token = localStorage.getItem("admin_token");
+
+      if (!file) return alert("Please select a CSV file first.");
+
+      const formData = new FormData();
+      formData.append("file", file); 
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/lecturers-upload`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        });
+
+        const data = await res.json();
+        if (res.ok) alert(data.message || "Lecturers Uploaded");
+        else alert("Upload Failed: " + data.error);
+      } catch (err) {
+        alert("Upload Error: " + err.message);
+      }
+    });
+  }
 });

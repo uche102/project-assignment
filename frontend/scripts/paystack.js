@@ -55,15 +55,15 @@
         }
       }
 
-      // Get Amount
+    
       const amountInput = document.getElementById("feeAmount");
       const amountNaira = amountInput ? parseInt(amountInput.value) : 9000;
 
-      //  Opens Paystack Popup
+    
       const handler = PaystackPop.setup({
         key: PAYSTACK_PUBLIC_KEY,
         email: `${user.username || "student"}@unn.edu.ng`,
-        amount: amountNaira * 100, // Converts to Kobo
+        amount: amountNaira * 100, 
         currency: "NGN",
         ref: `SCH_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
         metadata: {
@@ -75,24 +75,22 @@
             },
           ],
         },
-        // ============================================================
-        //  ON SUCCESS: "Verify" and Save
-        // ============================================================
+        
         callback: function (response) {
-          // This "Verifying..."
+        
           payBtn.textContent = "Verifying...";
           payBtn.disabled = true;
 
-          // A. HYBRID SYNC: Local fallback
+          
           const currentTotal = parseInt(
             localStorage.getItem("fees_paid") || "0",
           );
           localStorage.setItem("fees_paid", currentTotal + amountNaira);
 
-          // B. UPDATES UI IMMEDIATELY
+          
           window.dispatchEvent(new Event("statsUpdated"));
 
-          // C. BACKEND SAVE (The "Verification" Step)
+        
           fetch(`${API_BASE}/api/payments/save`, {
             method: "POST",
             headers: {
@@ -102,7 +100,7 @@
             body: JSON.stringify({
               reference: response.reference,
               amount: amountNaira,
-              username: studentID, // Saves RegNo to Database
+              username: studentID, 
             }),
           })
             .then((res) => res.json())
@@ -112,12 +110,12 @@
               payBtn.disabled = false;
               payBtn.style.background = "#16a34a"; 
 
-              // Refresh Dashboard again
+            
               window.dispatchEvent(new Event("statsUpdated"));
             })
             .catch((err) => {
               console.error("Backend Sync Error:", err);
-              // Even if DB fails,   worked locally
+              
               alert("Payment successful (Local). Backend sync pending.");
               payBtn.disabled = false;
             });

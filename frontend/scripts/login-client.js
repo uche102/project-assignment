@@ -4,14 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!form) return;
 
-  // ============================
-  // Config
-  // ============================
-  const API_BASE = "http://localhost:4000"; // change in production
+  
+  const API_BASE = "http://localhost:4000"; 
 
-  // ============================
-  // Helpers
-  // ============================
+  
   function decodeToken(token) {
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
@@ -25,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const payload = decodeToken(token);
     if (!payload) return;
 
-    // Ensure the username is available for the dashboard
+    
     window.state = window.state || {};
     window.state.user = {
       id: payload.id,
@@ -33,13 +29,11 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  // Restore user on refresh
+
   const savedToken = localStorage.getItem("token");
   if (savedToken) restoreUser(savedToken);
 
-  // ============================
-  // Login submit
-  // ============================
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -171,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
             status.style.color = "green";
             status.textContent = "Success! Returning to login...";
 
-            // Auto fills login and return
+          
             setTimeout(() => {
               document.getElementById("username").value = u;
               document.getElementById("password").value = p;

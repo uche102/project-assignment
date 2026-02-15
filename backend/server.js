@@ -10,22 +10,16 @@ const fs = require("fs");
 
 const app = express();
 
-/* =======================
-   CONFIG
-======================= */
+
 const PORT = Number(process.env.PORT) || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-key";
 const BCRYPT_ROUNDS = Number(process.env.BCRYPT_ROUNDS) || 12;
 
-/* =======================
-   STATIC FILES SETUP
-======================= */
+
 const frontendStaticDir = path.join(__dirname, "../frontend");
 app.use(express.static(frontendStaticDir));
 
-/* =======================
-   POSTGRES CLIENT
-======================= */
+
 const pgClient = new Client({
   user: process.env.PG_USER || "postgres",
   host: process.env.PG_HOST || "localhost",
@@ -61,14 +55,13 @@ function requireAuth(req, res, next) {
   }
 }
 
-/* =======================
-   PAYMENT ROUTES
-======================= */
+
+//PAYMENT ROUTES
 app.get("/api/config/paystack", (req, res) => {
   res.json({ key: process.env.PAYSTACK_PUBLIC_KEY });
 });
 
-// 1. GET TOTAL (FIXED: No nested routes inside)
+
 app.get("/api/payments/total/:regNo", requireAuth, async (req, res) => {
   try {
     const { regNo } = req.params;
@@ -134,7 +127,7 @@ app.post("/api/payments/save", requireAuth, async (req, res) => {
   } catch (err) {
     console.error("VERIFICATION ERROR:", err);
 
-    // If it's a duplicate, we treat it as success (it's already safe)
+  
     if (err.code === "23505") {
       return res.json({ message: "Payment already recorded" });
     }
@@ -142,10 +135,8 @@ app.post("/api/payments/save", requireAuth, async (req, res) => {
     res.status(500).json({ error: "Server error during verification" });
   }
 });
+//  LECTURER DIRECTORY
 
-/* =======================
-   LECTURER DIRECTORY
-======================= */
 app.get("/api/lecturers", async (req, res) => {
   try {
     const query = `
@@ -253,11 +244,9 @@ app.get("/api/dashboard/stats/:username", requireAuth, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Could not fetch stats" });
   }
-});
+})
+  // COURSE REGISTRATION ROUTES
 
-/* =======================
-   COURSE REGISTRATION ROUTES
-======================= */
 app.post("/api/courses/register", requireAuth, async (req, res) => {
   try {
     const { course_code, course_title, units } = req.body;
@@ -334,9 +323,7 @@ app.get("/api/results/:regNo", requireAuth, async (req, res) => {
   }
 });
 
-/* =======================
-   AUTH ROUTES
-======================= */
+
 app.post("/api/auth/user-login", async (req, res) => {
   try {
     const { reg_no, password } = req.body;
