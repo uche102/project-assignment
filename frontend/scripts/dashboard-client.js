@@ -29,17 +29,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const percentage = (val / 5) * 100;
       sideCgpaBar.style.width = `${percentage}%`;
 
-      // Color Logic for Sidebar
-      if (val >= 4.5)
-        sideCgpaBar.style.background = "#28a745"; // Green
-      else if (val >= 3.5)
-        sideCgpaBar.style.background = "#17a2b8"; // Blue
-      else if (val >= 2.5)
-        sideCgpaBar.style.background = "#ffc107"; // Yellow
-      else sideCgpaBar.style.background = "#dc3545"; // Red
+      if (val >= 4.5) sideCgpaBar.style.background = "#28a745";
+      else if (val >= 3.5) sideCgpaBar.style.background = "#17a2b8";
+      else if (val >= 2.5) sideCgpaBar.style.background = "#ffc107";
+      else sideCgpaBar.style.background = "#dc3545";
     }
 
-    // ---  UPDATED DASHBOARD MAIN AREA ---
+    //   DASHBOARD MAIN AREA
     const nameDisplay = document.getElementById("displayUsername");
     const regDisplay = document.getElementById("displayRegNo");
     const topbarName = document.getElementById("topbarUsername");
@@ -58,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (feesEl) feesEl.textContent = `₦${fees.toLocaleString()}`;
     if (cgpaCard) cgpaCard.textContent = cgpa;
 
-    // ---  UPDATE DASHBOARD CGPA CARD (Visual Bar) ---
+    // DASHBOARD CGPA CARD (Visual Bar)
     const dashBar = document.getElementById("cgpaProgressBar");
     const dashRemark = document.getElementById("cgpaRemark");
 
@@ -162,6 +158,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (resCourses.ok) {
         const data = await resCourses.json();
         courseCount = data.length;
+      }
+      try {
+        const localBorrowed = JSON.parse(
+          localStorage.getItem("borrowed_courses") || "[]",
+        );
+        console.log("Found borrowed courses:", localBorrowed.length);
+        courseCount += localBorrowed.length;
+      } catch (e) {
+        console.error("Error reading borrowed courses:", e);
       }
 
       let feesTotal = 0;

@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- 2. LOGIN LOGIC ---
   if (loginBtn) {
     loginBtn.addEventListener("click", async () => {
-      // NOTE: We send the input value as 'reg_no' because the backend login expects 'reg_no'
       const username = document.getElementById("adminUser").value;
       const password = document.getElementById("adminPass").value;
 
@@ -36,15 +35,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (res.ok) {
           localStorage.setItem("admin_token", data.token);
-          location.reload(); // Reloads to refresh state
+          location.reload();
         } else {
-          alert(
-            "Login Failed: " + (data.error || "Check username (use 'admin')"),
-          );
+          alert("Login Failed: " + (data.error || "Invalid credentials"));
         }
       } catch (err) {
         console.error(err);
-        alert("Server Error. Is the backend running?");
+        alert("Server Error. Check console.");
       }
     });
   }
@@ -68,14 +65,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!courseSelect || !lecturerSelect) return;
 
-    // Fetch Courses
+    // --- FETCH COURSES ---
     try {
+      console.log("Fetching courses...");
       const res = await fetch(`${API_BASE}/api/admin/courses`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       const courses = await res.json();
 
-      if (Array.isArray(courses)) {
+      // DEBUG: Log what the server actually sent
+      console.log("Server Course Response:", courses);
+
+      if (res.ok && Array.isArray(courses)) {
         courseSelect.innerHTML =
           '<option value="">-- Select Course --</option>' +
           courses
@@ -84,12 +86,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 `<option value="${c.code}">${c.code} - ${c.title}</option>`,
             )
             .join("");
+      } else {
+        // ERROR HANDLING
+        console.error("Failed to load courses:", courses);
+        courseSelect.innerHTML =
+          '<option value="">Error Loading Courses</option>';
+        if (res.status === 401) {
+          alert("Session expired. Please relogin.");
+          localStorage.removeItem("admin_token");
+          location.reload();
+        }
       }
     } catch (err) {
-      console.error("Course Load Error", err);
+      console.error("Course Network Error", err);
+      courseSelect.innerHTML = '<option value="">Network Error</option>';
     }
 
-    // Fetch Lecturers
+    // --- FETCH LECTURERS ---
     try {
       const res = await fetch(`${API_BASE}/api/lecturers`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -108,7 +121,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- 4. ASSIGN COURSE FUNCTION ---
+  // --- 4. GLOBAL FUNCTIONS (Attached to Window) ---
+
   window.assignCourse = async function () {
     const courseCode = document.getElementById("assignCourseSelect").value;
     const lecturerId = document.getElementById("assignLecturerSelect").value;
@@ -121,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     statusEl.textContent = "Assigning...";
+    statusEl.style.color = "blue";
 
     try {
       const res = await fetch(`${API_BASE}/api/admin/assign-course`, {
@@ -147,7 +162,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // --- 5. CREATE COURSE FUNCTION ---
   window.createCourse = async function () {
     const code = document.getElementById("newCourseCode").value;
     const title = document.getElementById("newCourseTitle").value;
@@ -156,6 +170,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const token = localStorage.getItem("admin_token");
 
     if (!code || !title) return alert("Code and Title are required");
+
+    // UI Feedback
+    const btn = document.querySelector("button[onclick='createCourse()']");
+    const originalText = btn.textContent;
+    btn.textContent = "Saving...";
+    btn.disabled = true;
 
     try {
       const res = await fetch(`${API_BASE}/api/admin/add-course`, {
@@ -167,23 +187,29 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({
           code: code,
           title: title,
-          unit: parseInt(unit) || 3,
-          level: parseInt(level) || 100,
+          unit: parseInt(unit) || 3, // Default to 3 if empty
+          level: parseInt(level) || 100, // Default to 100 if empty
         }),
       });
 
+      const data = await res.json(); // Get error message if any
+
       if (res.ok) {
-        alert("Course Created!");
+        alert("Course Created Successfully!");
         location.reload();
       } else {
-        alert("Failed to create course.");
+        alert("Failed: " + (data.error || "Unknown Error"));
+        btn.textContent = originalText;
+        btn.disabled = false;
       }
     } catch (e) {
-      alert("Network Error");
+      alert("Network Error: " + e.message);
+      btn.textContent = originalText;
+      btn.disabled = false;
     }
   };
 
-  
+  // --- 5. FILE UPLOADS ---
   const uploadResultsBtn = document.getElementById("uploadResultsBtn");
   if (uploadResultsBtn) {
     uploadResultsBtn.addEventListener("click", async () => {
@@ -193,26 +219,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!file) return alert("Please select a CSV file first.");
 
-      
       const formData = new FormData();
       formData.append("file", file);
 
       try {
         const res = await fetch(`${API_BASE}/api/admin/upload-results`, {
           method: "POST",
-          headers: { Authorization: `Bearer ${token}` }, 
+          headers: { Authorization: `Bearer ${token}` },
           body: formData,
         });
-
         const data = await res.json();
-        if (res.ok) alert(data.message || "Upload Successful");
-        else alert("Upload Failed: " + data.error);
+        alert(
+          res.ok
+            ? data.message || "Upload Successful"
+            : "Failed: " + data.error,
+        );
       } catch (err) {
         alert("Upload Error: " + err.message);
       }
     });
   }
-
 
   const uploadLecturersBtn = document.getElementById("uploadLecturersBtn");
   if (uploadLecturersBtn) {
@@ -224,7 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!file) return alert("Please select a CSV file first.");
 
       const formData = new FormData();
-      formData.append("file", file); 
+      formData.append("file", file);
 
       try {
         const res = await fetch(`${API_BASE}/api/admin/lecturers-upload`, {
@@ -232,10 +258,12 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: { Authorization: `Bearer ${token}` },
           body: formData,
         });
-
         const data = await res.json();
-        if (res.ok) alert(data.message || "Lecturers Uploaded");
-        else alert("Upload Failed: " + data.error);
+        alert(
+          res.ok
+            ? data.message || "Upload Successful"
+            : "Failed: " + data.error,
+        );
       } catch (err) {
         alert("Upload Error: " + err.message);
       }

@@ -170,17 +170,4 @@ body::before {
   height: 100%;
 }
 
-/* background-image: url('../nacos.png'); 
-  
-  background-repeat: no-repeat;
-  background-position: center;
- 
-  background-size: 500px; 
-  
-  
-  image-rendering: -webkit-optimize-contrast;
-  
-  opacity: 0.3;
-  z-index: 90;
-  pointer-events: none;
-} */
+

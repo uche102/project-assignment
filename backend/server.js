@@ -10,15 +10,12 @@ const fs = require("fs");
 
 const app = express();
 
-
 const PORT = Number(process.env.PORT) || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-key";
 const BCRYPT_ROUNDS = Number(process.env.BCRYPT_ROUNDS) || 12;
 
-
 const frontendStaticDir = path.join(__dirname, "../frontend");
 app.use(express.static(frontendStaticDir));
-
 
 const pgClient = new Client({
   user: process.env.PG_USER || "postgres",
@@ -55,12 +52,10 @@ function requireAuth(req, res, next) {
   }
 }
 
-
 //PAYMENT ROUTES
 app.get("/api/config/paystack", (req, res) => {
   res.json({ key: process.env.PAYSTACK_PUBLIC_KEY });
 });
-
 
 app.get("/api/payments/total/:regNo", requireAuth, async (req, res) => {
   try {
@@ -77,7 +72,6 @@ app.get("/api/payments/total/:regNo", requireAuth, async (req, res) => {
   }
 });
 
-
 // ==========================================
 // REAL PAYMENT VERIFICATION ROUTE
 // ==========================================
@@ -92,8 +86,6 @@ app.post("/api/payments/save", requireAuth, async (req, res) => {
       return res.status(400).json({ error: "Missing payment details" });
     }
 
-    //  
-    //  use  Secret Key here to be secure
     const paystackResponse = await fetch(
       `https://api.paystack.co/transaction/verify/${reference}`,
       {
@@ -107,16 +99,13 @@ app.post("/api/payments/save", requireAuth, async (req, res) => {
 
     const paystackData = await paystackResponse.json();
 
-    // CHECK STATUS
     if (!paystackData.status || paystackData.data.status !== "success") {
       console.error("Paystack Verification Failed:", paystackData);
       return res.status(400).json({ error: "Payment verification failed" });
     }
 
-    //  GET REAL AMOUNT
     const realAmount = paystackData.data.amount / 100;
 
-    //  SAVE TO DATABASE
     await pgClient.query(
       "INSERT INTO payments_pg (student, reference, amount, status) VALUES ($1, $2, $3, 'success')",
       [username, reference, realAmount],
@@ -127,7 +116,6 @@ app.post("/api/payments/save", requireAuth, async (req, res) => {
   } catch (err) {
     console.error("VERIFICATION ERROR:", err);
 
-  
     if (err.code === "23505") {
       return res.json({ message: "Payment already recorded" });
     }
@@ -135,7 +123,6 @@ app.post("/api/payments/save", requireAuth, async (req, res) => {
     res.status(500).json({ error: "Server error during verification" });
   }
 });
-//  LECTURER DIRECTORY
 
 app.get("/api/lecturers", async (req, res) => {
   try {
@@ -213,7 +200,7 @@ app.post("/api/admin/add-course", requireAuth, async (req, res) => {
     const newCourse = await pgClient.query(
       `INSERT INTO courses_directory (code, title, unit, level)
        VALUES ($1, $2, $3, $4) RETURNING *`,
-      [code, title, unit, level], // <--- Comma is fixed here
+      [code, title, unit, level], 
     );
     res.json({ message: "Course Created", course: newCourse.rows[0] });
   } catch (err) {
@@ -244,8 +231,8 @@ app.get("/api/dashboard/stats/:username", requireAuth, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Could not fetch stats" });
   }
-})
-  // COURSE REGISTRATION ROUTES
+});
+// COURSE REGISTRATION ROUTES
 
 app.post("/api/courses/register", requireAuth, async (req, res) => {
   try {
@@ -323,7 +310,6 @@ app.get("/api/results/:regNo", requireAuth, async (req, res) => {
   }
 });
 
-
 app.post("/api/auth/user-login", async (req, res) => {
   try {
     const { reg_no, password } = req.body;
@@ -369,12 +355,12 @@ app.get("/", (req, res) =>
 );
 
 /* =======================
-   POSTGRES START
+   DATABASE START
 ======================= */
 (async function start() {
   try {
     await pgClient.connect();
-    
+
     console.log("Postgres Ready.");
     app.listen(PORT, () =>
       console.log(`Server running on http://localhost:${PORT}`),

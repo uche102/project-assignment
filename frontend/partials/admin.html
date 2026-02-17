@@ -25,36 +25,38 @@
         <button id="adminLoginBtn">Secure Login</button>
       </div>
 
-      <div id="adminDashboard" class="hidden">
+      <div id="adminDashboard" class="hidden container">
         <div class="grid-container">
           <div class="card border-green">
             <div class="card-header">
               <h3>Create New Course</h3>
             </div>
             <div class="card-body">
-              <p class="muted">Add a course to the database.</p>
-              <input
+              <input class="green-card"
                 type="text"
                 id="newCourseCode"
                 placeholder="Code (e.g. CSC201)"
               />
               <input
+              class="green-card"
                 type="text"
                 id="newCourseTitle"
                 placeholder="Title (e.g. Java Programming)"
               />
               <div class="row">
                 <input
+                class="green-card"
                   type="number"
                   id="newCourseUnit"
                   placeholder="Units"
-                  style="width: 48%"
+                  style="width: 50%"
                 />
                 <input
+                class="green-card"
                   type="text"
                   id="newCourseLevel"
                   placeholder="Lvl (400)"
-                  style="width: 48%"
+                  style="width: 50%"
                 />
               </div>
               <button onclick="createCourse()">Create Course</button>
@@ -64,10 +66,9 @@
 
           <div class="card border-blue">
             <div class="card-header">
-              <h3> Assign Course</h3>
+              <h3>Assign Course</h3>
             </div>
             <div class="card-body">
-              <p class="muted">Link a lecturer to a course.</p>
               <label>Select Course</label>
               <select id="assignCourseSelect">
                 <option value="">Loading...</option>
@@ -85,12 +86,9 @@
 
           <div class="card border-orange">
             <div class="card-header">
-              <h3> Upload Results</h3>
+              <h3>Upload Results</h3>
             </div>
             <div class="card-body">
-              <p class="muted small">
-                CSV Headers: student, course_code, grade, unit
-              </p>
               <input type="file" id="resultFile" accept=".csv" />
               <button id="uploadResultsBtn" class="btn-grey">
                 Upload Results
@@ -104,9 +102,6 @@
               <h3>Upload Lecturers</h3>
             </div>
             <div class="card-body">
-              <p class="muted small">
-                CSV Headers: name, email, office, courses
-              </p>
               <input type="file" id="lecturerFile" accept=".csv" />
               <button id="uploadLecturersBtn" class="btn-grey">
                 Upload Lecturers
@@ -115,11 +110,10 @@
           </div>
         </div>
       </div>
+      <footer class="container">
+        <p>&copy; 2026 UNN Portal Admin</p>
+      </footer>
     </div>
-
-    <footer>
-      <p>&copy; 2026 UNN Portal Admin</p>
-    </footer>
 
     <script src="/scripts/admin.js"></script>
   </body>

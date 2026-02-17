@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("Borrow Client: Active");
 
   
-  //  MOCK DATA
+  //  MOCk DATA
   
   const borrowableCourses = [
     {

@@ -1,96 +1,68 @@
-
-
 (function () {
-  //  Define Config LOCALLY (Prevents "Redeclaration" errors)
-  const API_BASE = "http://localhost:4000";
+  const API_BASE = window.API_BASE || "http://localhost:4000"; // Use global or default
   let PAYSTACK_PUBLIC_KEY = null;
 
-  //  Load Key from Backend
   async function loadPaystackKey() {
     try {
       const res = await fetch(`${API_BASE}/api/config/paystack`);
-      if (!res.ok) throw new Error("Failed to load Paystack key");
       const data = await res.json();
       PAYSTACK_PUBLIC_KEY = data.key;
+      console.log("Paystack Key Loaded:", PAYSTACK_PUBLIC_KEY ? "Yes" : "No");
     } catch (err) {
-      console.error("Paystack Init Error:", err);
+      console.error("Paystack Key Error:", err);
     }
   }
 
-  // Initialize Button Logic
   function initPaystack() {
+    console.log("Initializing Paystack Button..."); // DEBUG LOG
     const payBtn = document.getElementById("payFeesBtn");
 
-    // Safety Checks
-    if (!payBtn || payBtn.dataset.bound === "true") return;
+    if (!payBtn) {
+      console.log("Pay Button not found in DOM");
+      return;
+    }
+
+    // Prevent double-binding
+    if (payBtn.dataset.bound === "true") return;
     payBtn.dataset.bound = "true";
 
-    // Get User Data
+    // User Data Logic
     let token = localStorage.getItem("token");
     let user = {};
     try {
-      if (token) {
-        token = token.replace(/['"]+/g, "").trim();
-        user = JSON.parse(atob(token.split(".")[1]));
-      }
+      if (token) user = JSON.parse(atob(token.split(".")[1]));
     } catch (e) {}
-
-    // Prioritize Reg No
     const studentID = user.reg_no || user.username || "student";
 
+    // CLICK HANDLER
     payBtn.addEventListener("click", async (e) => {
       e.preventDefault();
 
+      // Check if Paystack script is in index.html
       if (typeof PaystackPop === "undefined") {
-        alert("Paystack library not loaded. Check your internet.");
+        alert("Error: Paystack inline script is missing from index.html!");
         return;
       }
 
+      if (!PAYSTACK_PUBLIC_KEY) await loadPaystackKey();
+
       if (!PAYSTACK_PUBLIC_KEY) {
-        // Try loading key again if missing
-        await loadPaystackKey();
-        if (!PAYSTACK_PUBLIC_KEY) {
-          alert("System loading... please wait 2 seconds and try again.");
-          return;
-        }
+        alert("Error: Could not load Paystack Public Key from server.");
+        return;
       }
 
-    
-      const amountInput = document.getElementById("feeAmount");
-      const amountNaira = amountInput ? parseInt(amountInput.value) : 9000;
-
-    
       const handler = PaystackPop.setup({
         key: PAYSTACK_PUBLIC_KEY,
         email: `${user.username || "student"}@unn.edu.ng`,
-        amount: amountNaira * 100, 
+        amount: 9000 * 100, // Fixed 9000 for demo
         currency: "NGN",
-        ref: `SCH_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+        ref: "SCH_" + Math.floor(Math.random() * 1000000000),
         metadata: {
-          custom_fields: [
-            {
-              display_name: "Student ID",
-              variable_name: "student",
-              value: studentID,
-            },
-          ],
+          custom_fields: [{ display_name: "Student ID", value: studentID }],
         },
-        
         callback: function (response) {
-        
-          payBtn.textContent = "Verifying...";
-          payBtn.disabled = true;
-
-          
-          const currentTotal = parseInt(
-            localStorage.getItem("fees_paid") || "0",
-          );
-          localStorage.setItem("fees_paid", currentTotal + amountNaira);
-
-          
-          window.dispatchEvent(new Event("statsUpdated"));
-
-        
+          alert("Payment Successful! Ref: " + response.reference);
+          // Verify with backend
           fetch(`${API_BASE}/api/payments/save`, {
             method: "POST",
             headers: {
@@ -99,45 +71,26 @@
             },
             body: JSON.stringify({
               reference: response.reference,
-              amount: amountNaira,
-              username: studentID, 
+              amount: 9000,
+              username: studentID,
             }),
-          })
-            .then((res) => res.json())
-            .then((data) => {
-              alert("Payment Verified & Saved!");
-              payBtn.textContent = "Pay Again";
-              payBtn.disabled = false;
-              payBtn.style.background = "#16a34a"; 
-
-            
-              window.dispatchEvent(new Event("statsUpdated"));
-            })
-            .catch((err) => {
-              console.error("Backend Sync Error:", err);
-              
-              alert("Payment successful (Local). Backend sync pending.");
-              payBtn.disabled = false;
-            });
+          });
         },
         onClose: function () {
           alert("Transaction cancelled.");
         },
       });
-
       handler.openIframe();
     });
   }
 
-  //  Run Init Logic
-  //  checks if document is ready, or wait for it
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", async () => {
-      await loadPaystackKey();
-      initPaystack();
-    });
-  } else {
-    // If already loaded (dynamic navigation), runs immediately
+  // EXPOSE GLOBALLY so nav-loader can see it
+  window.initPaystack = function () {
     loadPaystackKey().then(initPaystack);
+  };
+
+  // Run automatically on first load if button exists
+  if (document.getElementById("payFeesBtn")) {
+    window.initPaystack();
   }
 })();

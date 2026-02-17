@@ -1,5 +1,3 @@
-
-
 //   window  bypasses module scoping
 window.generateCalendarPDF = function () {
   console.log("PDF Generation Triggered...");
@@ -30,9 +28,7 @@ window.generateCalendarPDF = function () {
   `;
   document.head.appendChild(style);
 
-  // Trigger the print/save dialog
   window.print();
 
-  // Cleanup after printing
   style.remove();
 };

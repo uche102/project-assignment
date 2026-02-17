@@ -121,6 +121,7 @@ body {
   padding: 30px;
   border-radius: var(--radius-lg);
   border: 1px solid rgba(255, 255, 255, 0.4);
+  margin-bottom: 2rem;
   box-shadow: var(--shadow-soft);
 }
 
@@ -234,4 +235,79 @@ body::before {
 
   z-index: 100;
   pointer-events: none;
+}
+
+#lecturerList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.lecturer-item {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.lecturer-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.lec-avatar {
+  width: 50px;
+  height: 50px;
+  background: #0a8a3a;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.lec-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.lec-info strong {
+  font-size: 1rem;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.lec-info p {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.lecturer-item button.primary-btn {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.lecturer-item button.primary-btn:hover {
+  background: #0a8a3a;
+  color: white;
+  border-color: #0a8a3a;
 }

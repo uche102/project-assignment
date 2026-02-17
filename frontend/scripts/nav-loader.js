@@ -10,6 +10,7 @@
     results: "results-client.js",
     "academic-fees": "paystack.js",
     "course-reg": "course-reg-client.js",
+    lecturers: "lecturer-client.js",
   };
 
   // =======================================
@@ -32,7 +33,7 @@
     return;
   }
 
-  // --- IMMEDIATE SIDEBAR UPDATE (The Fix) ---
+  // update sidebar
   function updateSidebar() {
     try {
       const cleanToken = token.replace(/['"]+/g, "").trim();
@@ -56,9 +57,8 @@
     }
   }
 
-  // =======================================
   //  DYNAMIC SCRIPT LOADER
-  // =======================================
+
   function loadPageScript(pageName) {
     const fileName = pageScripts[pageName];
     if (!fileName) return;
@@ -66,20 +66,26 @@
     const fullPath = `${SCRIPT_PATH}${fileName}`;
     const existingScript = document.querySelector(`script[src="${fullPath}"]`);
 
-    if (existingScript) {
+    const runPageLogic = () => {
       if (pageName === "dashboard" && window.loadAllStats)
         window.loadAllStats();
       if (pageName === "profile" && window.loadProfile) window.loadProfile();
       if (pageName === "results" && window.renderResults)
         window.renderResults();
+
+      if (pageName === "lecturers" && window.loadLecturers)
+        window.loadLecturers();
+
+      if (pageName === "academic-fees" && window.initPaystack)
+        window.initPaystack();
+    };
+
+    if (existingScript) {
+      runPageLogic();
     } else {
       const script = document.createElement("script");
       script.src = fullPath;
-      script.onload = () => {
-        if (pageName === "dashboard" && window.loadAllStats)
-          window.loadAllStats();
-        if (pageName === "profile" && window.loadProfile) window.loadProfile();
-      };
+      script.onload = runPageLogic;
       document.body.appendChild(script);
     }
   }
@@ -115,6 +121,8 @@
       const text = await res.text();
       const wrapper = document.createElement("div");
       wrapper.innerHTML = text;
+      ` <strong>University of Nigeria</strong>
+                <small>Student Portal</small>`;
       return {
         navNode: wrapper.querySelector(".partial-nav"),
         contentNode: wrapper.querySelector(".partial-content"),
