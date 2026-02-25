@@ -1,16 +1,31 @@
 <div class="partial-nav">
-  <button data-page="course-registration" class="menu-item">Course Registration</button>
+  <button data-page="course-registration" class="menu-item">
+    Course Registration
+  </button>
   <p>Register for your departmental courses.</p>
+
+  <div class="semester-select" role="radiogroup" aria-label="Select semester">
+    <label>
+      <input type="radio" name="semester" value="1" checked />
+      1st semester courses
+    </label>
+    <label>
+      <input type="radio" name="semester" value="2" />
+      2nd semester courses
+    </label>
+  </div>
 </div>
 
-<div class="partial-content" data-page="course-registration" data-title="Course Registration">
+<div
+  class="partial-content"
+  data-page="course-registration"
+  data-title="Course Registration"
+>
   <section class="page">
     <h3>Departmental Courses</h3>
-    <p class="muted">Click "Register" to add these to your dashboard.</p>
 
     <div id="course-list" class="list">
-       <p>Loading courses...</p>
+      <p>Loading courses...</p>
     </div>
-
   </section>
 </div>

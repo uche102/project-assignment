@@ -200,7 +200,7 @@ app.post("/api/admin/add-course", requireAuth, async (req, res) => {
     const newCourse = await pgClient.query(
       `INSERT INTO courses_directory (code, title, unit, level)
        VALUES ($1, $2, $3, $4) RETURNING *`,
-      [code, title, unit, level], 
+      [code, title, unit, level],
     );
     res.json({ message: "Course Created", course: newCourse.rows[0] });
   } catch (err) {
